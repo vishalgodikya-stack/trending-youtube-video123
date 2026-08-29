@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's YouTube Trends | TrendWave</title>
+    <meta name="description" content="Discover the most trending YouTube videos of today in a beautiful, dynamic layout.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <header class="glass-header">
+        <div class="header-content">
+            <h1><i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span></h1>
+            <p>Today's hottest YouTube videos</p>
+        </div>
+        <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+            <p>Riding the wave...</p>
+        </div>
+        
+        <div id="error-message" class="error-container hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Whoops! Failed to catch the latest wave.<br>Our sources might be down. Please try again later.</p>
+            <button id="retry-btn" class="glass-button">Retry Connection</button>
+        </div>
+
+        <div id="video-grid" class="video-grid hidden">
+            <!-- Video cards will be injected here dynamically -->
+        </div>
+    </main>
+
+    <footer class="glass-footer">
+        <p>Curated automatically &bull; <span id="current-date"></span></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

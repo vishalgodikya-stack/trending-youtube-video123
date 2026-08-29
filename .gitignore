@@ -1,0 +1,44 @@
+﻿# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor & IDE Configurations
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Node / Package Manager Files (if used)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / Output / Cache Directories
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Local Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.local
+
+# Temporary / Log Files
+*.log
+*.tmp
+temp/
+tmp/
