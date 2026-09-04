@@ -1,4 +1,4 @@
-﻿# 🌊 TrendWave — Real-Time YouTube Trends Dashboard
+# 🌊 TrendWave — Real-Time YouTube Trends Dashboard
 
 <div align="center">
 
@@ -6,11 +6,11 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=for-the-badge&logo=vercel)
 
-**Discover and explore today's hottest YouTube videos with a sleek, real-time glassmorphic dashboard.**
+**Discover and explore today's hottest YouTube trends with a sleek, real-time glassmorphic dashboard.**
 
-[View Demo](#-how-to-run--use) • [Report Bug](https://github.com/) • [Request Feature](https://github.com/)
+[View Live Demo](https://video123.vercel.app/) • [Report Bug](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues) • [Request Feature](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues)
 
 </div>
 
@@ -18,7 +18,7 @@
 
 ## 📌 Project Overview
 
-**TrendWave** is a lightweight, responsive web application designed to track and display real-time trending YouTube videos for the current day. Built with vanilla web technologies, the application delivers a distraction-free user experience featuring a modern dark-mode glassmorphism interface, smooth micro-animations, and dynamic theme switching.
+**TrendWave** is a lightweight, responsive web application designed to track and display real-time trending YouTube topics. Built with vanilla web technologies, the application delivers a distraction-free user experience featuring a modern dark-mode glassmorphism interface, smooth micro-animations, and regional filtering capabilities.
 
 The project retrieves live trending data directly through privacy-friendly public Piped API instances with automatic multi-instance failover, ensuring instant loading without requiring any API keys, authentication, or server-side dependencies.
 
@@ -26,13 +26,12 @@ The project retrieves live trending data directly through privacy-friendly publi
 
 ## ✨ Features
 
-- 🔥 **Real-Time Trending Feed**: Automatically fetches and displays today's top trending YouTube videos.
-- 🔄 **Multi-Instance API Fallback**: Queries multiple reliable API endpoints sequentially to ensure uninterrupted service availability even if an instance is temporarily unreachable.
-- 🌓 **Dark & Light Mode Switcher**: Seamlessly toggles between a vibrant dark-mode glassmorphism aesthetic and a clean light theme, with user preference saved in localStorage.
-- 📊 **Smart Metadata Formatting**: Converts raw view counts into readable abbreviations (1.2M, 450K) and formats durations (HH:MM:SS / MM:SS / Live).
-- 🎨 **Modern Glassmorphism UI**: Features floating animated background gradient blobs, backdrop blur effects, interactive card lift & glow on hover, and custom video duration badges.
-- 📱 **Fully Responsive Layout**: Built with CSS Grid and Flexbox to adapt effortlessly across mobile phones, tablets, and desktop displays.
-- 🛡️ **Error Handling & Retry Mechanism**: Clear visual feedback with an interactive retry button if network connectivity fails.
+- 🔥 **Real-Time Trending Feed**: Automatically fetches and displays today's top trending YouTube topics and videos.
+- 🌍 **Regional Filtering**: View what's trending across different countries (Global, US, UK, India, Japan, Germany, and Brazil). Your selection is automatically saved!
+- 🔄 **Multi-Instance API Fallback**: Queries multiple reliable API endpoints sequentially to ensure uninterrupted service availability.
+- 🌓 **Dark & Light Mode Switcher**: Seamlessly toggles between a vibrant dark-mode glassmorphism aesthetic and a clean light theme.
+- 📊 **Smart Metadata Formatting**: Converts raw view counts into readable abbreviations and formats durations dynamically.
+- 🎨 **Modern Glassmorphism UI**: Features floating animated background gradient blobs, backdrop blur effects, and interactive card lift.
 - ⚡ **Pure Vanilla Stack**: 100% zero external npm dependencies or bundlers required—runs natively in any modern web browser.
 
 ---
@@ -42,74 +41,32 @@ The project retrieves live trending data directly through privacy-friendly publi
 | Technology | Purpose |
 |---|---|
 | **HTML5** | Semantic structure, accessibility, and meta tags |
-| **CSS3** | Glassmorphism (ackdrop-filter), CSS Custom Properties (Variables), CSS Grid, Flexbox, Keyframe animations |
-| **JavaScript (ES6+)** | Asynchronous Fetch API, DOM manipulation, state management, and localStorage persistence |
+| **CSS3** | Glassmorphism (`backdrop-filter`), CSS Grid, Flexbox, Keyframe animations |
+| **JavaScript (ES6+)** | Asynchronous Fetch API, DOM manipulation, AbortControllers, and localStorage persistence |
 | **Font Awesome 6.4.0** | Vector icon system for controls, indicators, and stats |
-| **Google Fonts (Outfit)** | Modern sans-serif typography |
-| **Piped API** | Privacy-friendly public proxy endpoints for YouTube trending data (No API key needed) |
+| **Piped API** | Privacy-friendly public proxy endpoints for YouTube trending data |
 
 ---
 
-## 📂 Project Structure
+## 🚀 How to Run & Use Locally
 
-`	ext
-youtube-trends/
-├── assets/
-│   └── screenshots/
-│       └── .gitkeep             # Placeholder directory for repository screenshots
-├── scripts/
-│   └── start-server.ps1         # Optional local development server for Windows PowerShell
-├── .gitignore                   # Standard Git ignore rules for OS, IDE, and temporary files
-├── app.js                       # Core application logic, API fetching, and UI rendering
-├── index.html                   # Main entry point and semantic HTML layout
-├── styles.css                   # Glassmorphism styling, CSS variables, and animations
-└── README.md                    # Comprehensive project documentation
-`
+Because TrendWave is built with standard web standards, you can run it locally in seconds.
 
----
-
-## 🚀 How to Run & Use
-
-Because TrendWave is built with standard web standards, you can run it locally in several easy ways:
-
-### Option 1: Direct Browser Launch (Fastest)
-Simply double-click index.html or open it with any web browser (Chrome, Edge, Firefox, Safari).
-
----
+### Option 1: Using VS Code Live Server
+1. Open the project folder in **Visual Studio Code**.
+2. Install the **Live Server** extension.
+3. Right-click `index.html` and select **"Open with Live Server"**.
 
 ### Option 2: Using the Included PowerShell Server (Windows)
-If you prefer running a local HTTP server:
-`powershell
+```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\start-server.ps1
-`
-Then open your browser and navigate to:
-`	ext
-http://localhost:8080
-`
+```
+Then open your browser and navigate to `http://localhost:8080`.
 
----
-
-### Option 3: Using VS Code Live Server Extension
-1. Open the project folder in **Visual Studio Code**.
-2. Install the **Live Server** extension (by Ritwick Dey).
-3. Right-click index.html and select **"Open with Live Server"**.
-
----
-
-### Option 4: Using Python HTTP Server
-If you have Python installed:
-`ash
-# Python 3.x
+### Option 3: Using Python HTTP Server
+```bash
 python -m http.server 8080
-`
-
----
-
-### Option 5: Free 1-Click Cloud Deployment
-You can host this project 24/7 for free using:
-- **GitHub Pages**: Go to your repository settings > **Pages** > Select branch main and folder / (root).
-- **Netlify Drop**: Drag and drop the project folder into [app.netlify.com/drop](https://app.netlify.com/drop).
-- **Vercel**: Import your GitHub repository to deploy in seconds.
+```
 
 ---
 
@@ -117,40 +74,27 @@ You can host this project 24/7 for free using:
 
 <div align="center">
 
-<!-- Place your actual screenshots in the assets/screenshots/ directory and update the path below -->
 <img src="assets/screenshots/preview.png" alt="TrendWave Dashboard Preview" width="800" onerror="this.onerror=null; this.src='https://placehold.co/800x450/0d1117/ffffff?text=TrendWave+Dashboard+Preview';" />
 
-*Figure 1: TrendWave Dashboard with live YouTube trends, glassmorphism cards, and dark theme.*
+*Figure 1: TrendWave Dashboard with live YouTube trends, glassmorphism cards, and regional selector.*
 
 </div>
-
-> **Tip**: To add your own screenshot:
-> 1. Take a screenshot of the running website.
-> 2. Save it as preview.png inside the ssets/screenshots/ folder.
-> 3. Commit and push the image to GitHub.
 
 ---
 
 ## 🔮 Future Improvements & Roadmap
 
-- [ ] **Regional Filters**: Add a country selection dropdown (US, UK, IN, JP, DE, etc.) to view localized trending topics.
+- [x] **Regional Filters**: Added a country selection dropdown to view localized trending topics.
 - [ ] **Category Tabs**: Filter trending videos by categories (Music, Gaming, News, Tech, Entertainment).
 - [ ] **In-App Search**: Real-time search bar to filter trending videos by title or creator.
 - [ ] **Modal Video Player**: Preview and watch videos directly inside an embedded modal window.
-- [ ] **Bookmark Favorites**: Save favorite trending videos to a local watch-later list.
 
 ---
 
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/) to submit improvements or bug reports.
-
-1. Fork the repository
-2. Create your feature branch (git checkout -b feature/AmazingFeature)
-3. Commit your changes (git commit -m 'Add some AmazingFeature')
-4. Push to the branch (git push origin feature/AmazingFeature)
-5. Open a Pull Request
+Feel free to check the [issues page](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues) to submit improvements or bug reports.
 
 ---
 
@@ -162,9 +106,5 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👤 Author
 
-- **GitHub**: [@YourUsername](https://github.com/)
-- **Project Name**: TrendWave
-
-<div align="center">
-Made with ❤️ for exploring trending content on YouTube.
-</div>
+- **GitHub**: [@vishalgodikya-stack](https://github.com/vishalgodikya-stack)
+- **Project**: TrendWave
