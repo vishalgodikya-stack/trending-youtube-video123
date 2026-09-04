@@ -6,10 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryBtn = document.getElementById('retry-btn');
     const themeToggle = document.getElementById('theme-toggle');
     const currentDateEl = document.getElementById('current-date');
+    const regionSelect = document.getElementById('region-select');
 
     // Set dynamic current date
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    currentDateEl.textContent = new Date().toLocaleDateString('en-US', options);
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    currentDateEl.textContent = new Date().toLocaleDateString('en-US', dateOptions);
+
+    // Region Management
+    const savedRegion = localStorage.getItem('trendwave_region') || 'IN';
+    if (regionSelect) {
+        regionSelect.value = savedRegion;
+        regionSelect.addEventListener('change', (e) => {
+            const newRegion = e.target.value;
+            localStorage.setItem('trendwave_region', newRegion);
+            fetchTrendingVideos(newRegion);
+        });
+    }
 
     // Dynamic Theme Handling
     const toggleTheme = () => {
@@ -17,19 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const icon = themeToggle.querySelector('i');
         
         if (document.body.classList.contains('light-mode')) {
-            // Switch to Light Mode
             icon.classList.remove('fa-moon');
             icon.classList.add('fa-sun');
             localStorage.setItem('theme', 'light');
         } else {
-            // Switch to Dark Mode
             icon.classList.remove('fa-sun');
             icon.classList.add('fa-moon');
             localStorage.setItem('theme', 'dark');
         }
     };
 
-    // Initialize Theme from LocalStorage
     if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light-mode');
         themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
@@ -61,35 +70,57 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const parseRelativeDate = (timestamp) => {
-        // Piped often returns seconds, or string duration "2 days ago". Let's handle generic inputs.
-        // Assuming Piped returns an uploadedDate string like "1 day ago"
-        return timestamp || 'Recently';
+        return timestamp || 'Trending now';
     };
 
+    // Extract exact 11-char YouTube Video ID
+    const extractVideoId = (video) => {
+        if (video.videoId) return video.videoId;
+        if (video.id) return video.id;
+        if (typeof video.url === 'string') {
+            const match = video.url.match(/(?:v=|\/vi?\/|youtu\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})/);
+            if (match) return match[1];
+        }
+        return null;
+    };
+
+    // Clean title for targeted YouTube topic search
+    const cleanTopicQuery = (title) => {
+        if (!title) return 'Trending';
+        return title
+            .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu, '')
+            .replace(/\b(LIVE|STREAM|OFFICIAL VIDEO|OFFICIAL MUSIC VIDEO|FULL EPISODE|4K|HD)\b/gi, '')
+            .replace(/[|#].*$/, '')
+            .trim() || title;
+    };
+
+    // Verified public Piped instances with CORS enabled
+    const getApiUrls = (region) => [
+        `https://api.piped.private.coffee/trending?region=${region}`,
+        `https://pipedapi.ducks.party/trending?region=${region}`,
+        `https://pipedapi.kavin.rocks/trending?region=${region}`
+    ];
+
     // Fetch Logic
-    const fetchTrendingVideos = async () => {
-        // Reset UI states
+    const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN')) => {
         hideError();
         showLoader();
         clearGrid();
 
-        // Piped API endpoints (Privacy-friendly YouTube frontend alternative)
-        // These are public instances that we fallback upon for reliability.
-        const apiUrls = [
-            'https://pipedapi.kavin.rocks/trending?region=US',
-            'https://pipedapi.tokhmi.xyz/trending?region=US',
-            'https://pipedapi.lunar.icu/trending?region=US',
-            'https://pipedapi.smnz.de/trending?region=US'
-        ];
-
+        const apiUrls = getApiUrls(region);
         let data = null;
         let fetchSuccess = false;
 
-        // Try instances sequentially until one succeeds
         for (const url of apiUrls) {
             try {
-                console.log(`Attempting to fetch trends from: ${url}`);
-                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                
+                const response = await fetch(url, { 
+                    headers: { 'Accept': 'application/json' },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 
@@ -97,11 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (Array.isArray(data) && data.length > 0) {
                     fetchSuccess = true;
-                    console.log(`Successfully fetched from: ${url}`);
                     break;
                 }
             } catch (error) {
-                console.warn(`Failed fetching from ${url}. Moving to next instance. Error:`, error.message);
+                console.warn(`Failed fetching from ${url}:`, error.message);
             }
         }
 
@@ -117,23 +147,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Logic
     const renderVideos = (videos) => {
-        // Render up to 30 top trending videos
         const videoList = videos.slice(0, 30);
         
         videoList.forEach((video, index) => {
-            // Staggered delay for cascading animation entrance
-            const animationDelay = index * 0.05;
+            const videoId = extractVideoId(video);
+            const cleanTopic = cleanTopicQuery(video.title);
             
-            // Reconstruct proper YouTube URLs from API payload
-            const videoUrl = `https://www.youtube.com${video.url}`;
+            // Topic exploration search link (opens exact matching topic results)
+            const topicSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanTopic)}`;
+            
+            // Direct video playback link fallback
+            const watchDirectUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : topicSearchUrl;
+            
             const tNavUrl = video.thumbnail || 'https://via.placeholder.com/640x360.png?text=No+Thumbnail';
             const avatarUrl = video.uploaderAvatar;
             
-            const card = document.createElement('a');
-            card.href = videoUrl;
-            card.target = '_blank';
-            card.rel = 'noopener noreferrer';
+            const card = document.createElement('article');
             card.className = 'video-card';
+            card.title = `Explore "${cleanTopic}" on YouTube`;
+            
+            // Clicking card explores the trending topic on YouTube
+            card.addEventListener('click', (e) => {
+                window.open(topicSearchUrl, '_blank', 'noopener,noreferrer');
+            });
             
             // Set initial invisible state for animation
             card.style.opacity = '0';
@@ -142,10 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="thumbnail-container">
                     <img src="${tNavUrl}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-                    <div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+                    <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="play-overlay" title="Watch direct video" onclick="event.stopPropagation();">
+                        <i class="fas fa-play-circle"></i>
+                    </a>
                     <div class="video-duration">${formatDuration(video.duration)}</div>
                 </div>
                 <div class="card-content">
+                    <span class="topic-tag"><i class="fas fa-fire"></i> Trending Topic</span>
                     <h3 class="video-title" title="${video.title}">${video.title}</h3>
                     <div class="channel-info">
                         ${avatarUrl ? 
@@ -155,8 +194,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="channel-name">${video.uploaderName}</span>
                     </div>
                     <div class="video-stats">
-                        <span class="stat"><i class="fas fa-fire"></i> ${formatViews(video.views)} views</span>
+                        <span class="stat"><i class="fas fa-eye"></i> ${formatViews(video.views)}</span>
                         <span class="stat"><i class="fas fa-clock"></i> ${parseRelativeDate(video.uploadedDate)}</span>
+                    </div>
+                    <div class="card-action">
+                        <span class="topic-explore-btn"><i class="fab fa-youtube"></i> Explore Topic</span>
+                        <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="watch-direct-btn" title="Watch direct video" onclick="event.stopPropagation();">
+                            <i class="fas fa-play"></i> Watch
+                        </a>
                     </div>
                 </div>
             `;
@@ -167,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
-            }, 50 + (index * 60));
+            }, 50 + (index * 50));
         });
 
         videoGrid.classList.remove('hidden');
@@ -184,7 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Event Listeners
-    retryBtn.addEventListener('click', fetchTrendingVideos);
+    retryBtn.addEventListener('click', () => {
+        const region = regionSelect ? regionSelect.value : 'IN';
+        fetchTrendingVideos(region);
+    });
 
     // Initial Bootstrap
     fetchTrendingVideos();

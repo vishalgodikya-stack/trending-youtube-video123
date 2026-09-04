@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,10 +19,25 @@
     <header class="glass-header">
         <div class="header-content">
             <h1><i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span></h1>
-            <p>Today's hottest YouTube videos</p>
+            <p>Today's hottest YouTube trends & topics</p>
         </div>
-        <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
-            <i class="fas fa-moon"></i>
+        <div class="header-controls">
+            <div class="region-picker" title="Change Trending Region">
+                <i class="fas fa-globe"></i>
+                <select id="region-select" aria-label="Select Region">
+                    <option value="IN">🇮🇳 India</option>
+                    <option value="US">🇺🇸 United States</option>
+                    <option value="GB">🇬🇧 United Kingdom</option>
+                    <option value="CA">🇨🇦 Canada</option>
+                    <option value="AU">🇦🇺 Australia</option>
+                    <option value="JP">🇯🇵 Japan</option>
+                    <option value="DE">🇩🇪 Germany</option>
+                    <option value="BR">🇧🇷 Brazil</option>
+                </select>
+            </div>
+            <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </div>
         </div>
     </header>
 
