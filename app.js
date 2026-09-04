@@ -14,14 +14,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Region Management
     const savedRegion = localStorage.getItem('trendwave_region') || 'IN';
+    let currentCategory = 'all';
+
     if (regionSelect) {
         regionSelect.value = savedRegion;
         regionSelect.addEventListener('change', (e) => {
             const newRegion = e.target.value;
             localStorage.setItem('trendwave_region', newRegion);
-            fetchTrendingVideos(newRegion);
+            fetchTrendingVideos(newRegion, currentCategory);
         });
     }
+
+    // Category Tabs Management
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    categoryTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            categoryTabs.forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            currentCategory = e.target.dataset.category;
+            const region = regionSelect ? regionSelect.value : 'IN';
+            fetchTrendingVideos(region, currentCategory);
+        });
+    });
 
     // Dynamic Theme Handling
     const toggleTheme = () => {
@@ -95,19 +110,30 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Verified public Piped instances with CORS enabled
-    const getApiUrls = (region) => [
-        `https://api.piped.private.coffee/trending?region=${region}`,
-        `https://pipedapi.ducks.party/trending?region=${region}`,
-        `https://pipedapi.kavin.rocks/trending?region=${region}`
-    ];
+    const getApiUrls = (region, category) => {
+        if (category === 'all') {
+            return [
+                `https://api.piped.private.coffee/trending?region=${region}`,
+                `https://pipedapi.ducks.party/trending?region=${region}`,
+                `https://pipedapi.kavin.rocks/trending?region=${region}`
+            ];
+        } else {
+            const query = `trending ${category}`;
+            return [
+                `https://api.piped.private.coffee/search?q=${encodeURIComponent(query)}&filter=videos`,
+                `https://pipedapi.ducks.party/search?q=${encodeURIComponent(query)}&filter=videos`,
+                `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`
+            ];
+        }
+    };
 
     // Fetch Logic
-    const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN')) => {
+    const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN'), category = 'all') => {
         hideError();
         showLoader();
         clearGrid();
 
-        const apiUrls = getApiUrls(region);
+        const apiUrls = getApiUrls(region, category);
         let data = null;
         let fetchSuccess = false;
 
@@ -126,7 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 data = await response.json();
                 
-                if (Array.isArray(data) && data.length > 0) {
+                let itemsArray = Array.isArray(data) ? data : (data.items || []);
+                
+                if (itemsArray.length > 0) {
+                    data = itemsArray;
                     fetchSuccess = true;
                     break;
                 }
@@ -231,9 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     retryBtn.addEventListener('click', () => {
         const region = regionSelect ? regionSelect.value : 'IN';
-        fetchTrendingVideos(region);
+        fetchTrendingVideos(region, currentCategory);
     });
 
     // Initial Bootstrap
-    fetchTrendingVideos();
+    fetchTrendingVideos(savedRegion, currentCategory);
 });

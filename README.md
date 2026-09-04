@@ -85,7 +85,7 @@ python -m http.server 8080
 ## 🔮 Future Improvements & Roadmap
 
 - [x] **Regional Filters**: Added a country selection dropdown to view localized trending topics.
-- [ ] **Category Tabs**: Filter trending videos by categories (Music, Gaming, News, Tech, Entertainment).
+- [x] **Category Tabs**: Filter trending videos by categories (Music, Gaming, News, Tech, Entertainment).
 - [ ] **In-App Search**: Real-time search bar to filter trending videos by title or creator.
 - [ ] **Modal Video Player**: Preview and watch videos directly inside an embedded modal window.
 
