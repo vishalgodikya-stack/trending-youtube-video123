@@ -139,6 +139,18 @@ document.addEventListener('DOMContentLoaded', () => {
         'https://pipedapi.kavin.rocks'
     ];
 
+    // Region display names for localized queries
+    const REGION_NAMES = {
+        IN: 'India',
+        US: 'United States',
+        GB: 'United Kingdom',
+        CA: 'Canada',
+        AU: 'Australia',
+        JP: 'Japan',
+        DE: 'Germany',
+        BR: 'Brazil'
+    };
+
     // Category keyword maps for client-side filtering
     const CATEGORY_KEYWORDS = {
         music: ['music', 'song', 'album', 'singer', 'rap', 'hip hop', 'remix', 'lyric', 'melody',
@@ -166,6 +178,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const keywords = CATEGORY_KEYWORDS[category] || [];
         const searchText = `${video.title || ''} ${video.uploaderName || ''}`.toLowerCase();
         return keywords.some(keyword => searchText.includes(keyword));
+    };
+
+    // Strict 24-hour present day filter & 5k minimum views & non-live
+    const isStrictlyTrendingToday = (video) => {
+        // 1. Exclude live streams (must have a valid positive duration)
+        if (!video.duration || video.duration <= 0) return false;
+
+        // 2. Minimum 5,000 views
+        const views = Number(video.views) || 0;
+        if (views < 5000) return false;
+
+        // 3. Must be uploaded strictly within the last 24 hours (present day)
+        if (video.uploaded && video.uploaded > 0) {
+            const diffMs = Date.now() - video.uploaded;
+            if (diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
+                return true;
+            }
+            // If uploaded timestamp is older than 24h, reject
+            if (diffMs > 24 * 60 * 60 * 1000) {
+                return false;
+            }
+        }
+
+        // Check relative time string (e.g., '3 hours ago', '45 minutes ago', 'today')
+        const dateStr = (video.uploadedDate || '').toLowerCase();
+        const isWithin24h = /minute|hour|today|moments/i.test(dateStr);
+        const isOlder = /day|week|month|year/i.test(dateStr);
+
+        return isWithin24h && !isOlder;
     };
 
     // Fetch from a Piped API instance with timeout
@@ -198,51 +239,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn(`Failed: ${base}`, error.message);
             }
         }
-        return null;
+        return [];
     };
 
-    // Main Fetch Logic — always region-accurate, with category filtering + supplement
+    // Main Fetch Logic — 24h present-day trending, >= 5k views, sorted high-to-low
     const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN'), category = 'all') => {
         hideError();
         showLoader();
         clearGrid();
 
-        // Step 1: Always fetch the trending feed for the selected region
-        const trendingData = await fetchWithFallback(
+        const countryName = REGION_NAMES[region] || 'India';
+        const candidatePool = [];
+        const seenUrls = new Set();
+
+        const addCandidates = (items) => {
+            if (!Array.isArray(items)) return;
+            items.forEach(item => {
+                if (item && item.url && !seenUrls.has(item.url)) {
+                    seenUrls.add(item.url);
+                    candidatePool.push(item);
+                }
+            });
+        };
+
+        // Source 1: Raw Trending endpoint for this region
+        const trendingItems = await fetchWithFallback(
             (base) => `${base}/trending?region=${region}`
         );
+        addCandidates(trendingItems);
 
-        if (!trendingData) {
-            hideLoader();
-            console.error('All API instances failed to return data.');
-            showError();
-            return;
-        }
+        // Source 2: Fresh present-day trending search for this region
+        const regionSearchQuery = category === 'all' 
+            ? `trending today ${countryName}`
+            : `trending ${category} today ${countryName}`;
 
-        // Step 2: Filter by category client-side
-        let filtered = trendingData.filter(v => matchesCategory(v, category));
+        const searchItems = await fetchWithFallback(
+            (base) => `${base}/search?q=${encodeURIComponent(regionSearchQuery)}&filter=videos`
+        );
+        addCandidates(searchItems);
 
-        // Step 3: If fewer than 3 matches, supplement with search results
-        if (category !== 'all' && filtered.length < 3) {
-            const searchQuery = `trending ${category}`;
-            const searchData = await fetchWithFallback(
-                (base) => `${base}/search?q=${encodeURIComponent(searchQuery)}&filter=videos`
+        // If category is specific, also fetch a targeted category query
+        if (category !== 'all') {
+            const categorySearchItems = await fetchWithFallback(
+                (base) => `${base}/search?q=${encodeURIComponent(`top ${category} ${countryName} 2026`)}&filter=videos`
             );
-            if (searchData) {
-                // Deduplicate by video URL
-                const existingUrls = new Set(filtered.map(v => v.url));
-                const supplements = searchData.filter(v => !existingUrls.has(v.url));
-                filtered = [...filtered, ...supplements];
-            }
+            addCandidates(categorySearchItems);
         }
+
+        // Apply filters:
+        // 1. Category filter
+        let filtered = candidatePool.filter(v => matchesCategory(v, category));
+
+        // 2. Strict 24h present day + >= 5k views + non-live
+        filtered = filtered.filter(isStrictlyTrendingToday);
+
+        // 3. Sort strictly from HIGH to LOW by view count
+        filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
 
         hideLoader();
 
         if (filtered.length > 0) {
             renderVideos(filtered);
         } else {
-            console.error('No videos matched the selected category.');
-            showError();
+            console.warn('No videos strictly matched the 24h present-day and 5k+ view filter.');
+            showCustomEmptyState(`No videos with 5,000+ views uploaded in the last 24 hours found for ${countryName} (${category.toUpperCase()}). Try another region or category!`);
         }
     };
 
@@ -322,7 +382,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI State Toggles
     const showLoader = () => loader.classList.remove('hidden');
     const hideLoader = () => loader.classList.add('hidden');
-    const showError = () => errorMessage.classList.remove('hidden');
+    const showError = () => {
+        errorMessage.querySelector('p').innerHTML = 'Whoops! Failed to catch the latest wave.<br>Our sources might be down. Please try again later.';
+        errorMessage.querySelector('i').className = 'fas fa-exclamation-circle';
+        errorMessage.classList.remove('hidden');
+    };
+    const showCustomEmptyState = (customText) => {
+        errorMessage.querySelector('p').innerHTML = customText;
+        errorMessage.querySelector('i').className = 'fas fa-clock';
+        errorMessage.classList.remove('hidden');
+    };
     const hideError = () => errorMessage.classList.add('hidden');
     const clearGrid = () => {
         videoGrid.innerHTML = '';
