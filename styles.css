@@ -107,7 +107,7 @@ body {
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border-bottom: 1px solid var(--card-border);
-    padding: 1.2rem 3rem;
+    padding: 1.1rem clamp(1.2rem, 2.5vw, 2.8rem);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -115,6 +115,16 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .header-content h1 {
@@ -124,6 +134,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    white-space: nowrap;
 }
 
 .highlight {
@@ -137,18 +148,21 @@ body {
     margin-top: 0.2rem;
     font-weight: 400;
     margin-left: 45px;
+    white-space: nowrap;
 }
 
 .header-controls {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .header-filter-group {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .global-pill-btn {
@@ -168,6 +182,8 @@ body {
     -webkit-backdrop-filter: var(--glass-blur);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .global-pill-btn:hover {
@@ -210,6 +226,8 @@ body {
     -webkit-backdrop-filter: var(--glass-blur);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-pill-btn:hover {
@@ -231,6 +249,7 @@ body {
     -webkit-backdrop-filter: var(--glass-blur);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .region-picker.dimmed {
@@ -280,6 +299,7 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .theme-toggle:hover {
@@ -294,6 +314,7 @@ body {
     font-size: 0.9rem;
     font-weight: 400;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Category Tabs — Floating Bottom Bar */
@@ -312,7 +333,10 @@ body {
     border-radius: 50px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 200;
+    max-width: min(96vw, 680px);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
     scrollbar-width: none; /* Firefox */
     transition: transform 0.4s cubic-bezier(0.68, -0.3, 0.32, 1.3),
                 opacity 0.4s cubic-bezier(0.68, -0.3, 0.32, 1.3);
@@ -338,6 +362,7 @@ body {
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-family: inherit;
 }
@@ -1892,6 +1917,7 @@ body {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .hamburger-btn:hover {
@@ -2095,23 +2121,274 @@ body {
 }
 
 /* ==========================================================================
-   Consolidated Mobile Responsive Rules (@media max-width: 768px)
-   Must strictly reside at the bottom to override all desktop components
+   Multi-Tier Responsive Rules & Adaptive Layouts
+   Supports Ultra-wide (>=1400px), Standard Desktop (1200px-1399px),
+   Laptops (1050px-1199px), Intermediate / Tablet Landscape (769px-1049px),
+   Tablet Portrait (641px-768px), Mobile (381px-640px), Small Mobile (<=380px)
+   Must reside at the bottom to ensure correct CSS cascade overriding.
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tier 1: Standard Desktop / Laptops (max-width: 1199px)
+   Hide long decorative date string to free up ~210px of horizontal header room
+   -------------------------------------------------------------------------- */
+@media (max-width: 1199px) {
+    .glass-header {
+        padding: 1rem 1.6rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.85rem;
+        gap: 10px;
+    }
+
+    .header-content p {
+        font-size: 0.88rem;
+        margin-left: 36px;
+    }
+
+    .header-date {
+        display: none !important;
+    }
+
+    .header-controls {
+        gap: 10px;
+    }
+
+    .global-pill-btn {
+        padding: 7px 14px;
+        font-size: 0.85rem;
+    }
+
+    .region-picker {
+        padding: 7px 12px;
+        font-size: 0.85rem;
+    }
+
+    .icon-pill-btn {
+        padding: 7px 14px;
+        font-size: 0.85rem;
+    }
+
+    .theme-toggle {
+        width: 42px;
+        height: 42px;
+        font-size: 1.2rem;
+    }
+
+    .hamburger-btn {
+        width: 42px;
+        height: 42px;
+        padding: 10px 9px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 2: Intermediate Laptops / Resized Desktop Windows (max-width: 1049px)
+   Hide header subtitle and desktop About/FAQ pills (accessible in 3-line menu)
+   Prevents any overflow between 769px and 1049px (Fixes Screenshot 2!)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1049px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .header-content p {
+        display: none !important;
+    }
+
+    .glass-header {
+        padding: 0.85rem 1.25rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.55rem;
+        gap: 8px;
+    }
+
+    .header-controls {
+        gap: 8px;
+    }
+
+    .global-pill-btn {
+        padding: 7px 13px;
+        font-size: 0.84rem;
+        gap: 6px;
+    }
+
+    .region-picker {
+        padding: 7px 11px;
+        font-size: 0.84rem;
+        gap: 6px;
+    }
+
+    #region-select {
+        font-size: 0.84rem;
+    }
+
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.05rem;
+    }
+
+    .hamburger-btn {
+        width: 40px;
+        height: 40px;
+        padding: 10px 9px;
+    }
+
+    .category-tabs {
+        bottom: 14px;
+        padding: 8px 12px;
+        gap: 6px;
+        max-width: calc(100vw - 24px);
+    }
+
+    .category-tab {
+        padding: 7px 14px;
+        font-size: 0.85rem;
+    }
+
+    .video-grid {
+        gap: 2rem;
+    }
+
+    .footer-container {
+        grid-template-columns: 1.4fr 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+
+    .seo-card, .seo-faq-card {
+        padding: 2.2rem 2rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 3: Tablets / Medium Windows (max-width: 768px)
+   Compact 1-row tablet navigation, 2-column footer, responsive grid
+   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
+    html, body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .header-date {
+        display: none !important;
+    }
+
+    .header-content p {
+        display: none !important;
+    }
+
+    .glass-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.35rem;
+        gap: 7px;
+    }
+
+    .header-controls {
+        gap: 6px;
+    }
+
+    .global-pill-btn {
+        padding: 6px 11px;
+        font-size: 0.8rem;
+        gap: 5px;
+    }
+
+    .region-picker {
+        padding: 6px 9px;
+        font-size: 0.8rem;
+        gap: 5px;
+    }
+
+    #region-select {
+        font-size: 0.8rem;
+    }
+
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 0.95rem;
+    }
+
+    .hamburger-btn {
+        width: 38px;
+        height: 38px;
+        padding: 9px 8px;
+    }
+
+    .container {
+        padding: 1.5rem 1.2rem 5.5rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.6rem;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .footer-brand {
+        grid-column: span 2;
+    }
+
+    .category-tabs {
+        bottom: 12px;
+        padding: 7px 10px;
+        gap: 5px;
+        max-width: calc(100vw - 20px);
+    }
+
+    .category-tab {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 4: Mobile Handheld Viewports (max-width: 640px)
+   2-Row Grid Header (Row 1: Logo, Theme, Hamburger; Row 2: Filters)
+   Single-column video feed, full-width actions, compact category bar (Screenshot 1!)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
     html, body {
         width: 100% !important;
         max-width: 100% !important;
         overflow-x: hidden !important;
     }
 
-    /* Header & Navigation */
+    /* Header & Navigation: Clean 2-row grid */
     .desktop-only {
         display: none !important;
     }
 
-    .hamburger-btn {
-        display: flex !important;
+    .header-date {
+        display: none !important;
+    }
+
+    .header-content p {
+        display: none !important;
     }
 
     .glass-header {
@@ -2122,7 +2399,7 @@ body {
             "filters filters filters" !important;
         row-gap: 8px !important;
         column-gap: 8px !important;
-        padding: 0.7rem 1rem !important;
+        padding: 0.65rem 0.9rem !important;
         align-items: center !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -2134,12 +2411,8 @@ body {
     }
 
     .header-content h1 {
-        font-size: 1.35rem !important;
+        font-size: 1.3rem !important;
         gap: 8px !important;
-    }
-
-    .header-content p {
-        display: none !important;
     }
 
     .header-controls {
@@ -2189,10 +2462,6 @@ body {
         width: 100% !important;
         max-width: 100% !important;
         font-size: 0.8rem !important;
-    }
-
-    .header-date {
-        display: none !important;
     }
 
     /* Main Container & Video Grid */
@@ -2272,15 +2541,17 @@ body {
         bottom: 8px !important;
         padding: 6px 8px !important;
         gap: 4px !important;
-        max-width: 96vw !important;
+        max-width: calc(100vw - 16px) !important;
+        border-radius: 40px !important;
     }
 
     .category-tab {
         padding: 6px 11px !important;
         font-size: 0.78rem !important;
+        flex-shrink: 0 !important;
     }
 
-    /* Site Footer (Critical single-column fix) */
+    /* Site Footer */
     .site-footer {
         padding: 3rem 1.2rem 8.5rem !important;
         width: 100% !important;
@@ -2309,7 +2580,7 @@ body {
 
     /* Reader Pages & Contact */
     .reader-nav {
-        padding: 0.8rem 1rem !important;
+        padding: 0.75rem 1rem !important;
     }
 
     .reader-container {
@@ -2361,5 +2632,79 @@ body {
     .error-btn-primary, .error-btn-secondary {
         width: 100% !important;
         justify-content: center !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 5: Extra-Small Phones (max-width: 380px)
+   Compact adjustments for iPhone SE, foldables (320px - 360px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 380px) {
+    .glass-header {
+        padding: 0.55rem 0.65rem !important;
+        row-gap: 6px !important;
+        column-gap: 6px !important;
+    }
+
+    .header-content h1 {
+        font-size: 1.15rem !important;
+        gap: 6px !important;
+    }
+
+    .theme-toggle {
+        width: 33px !important;
+        height: 33px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .hamburger-btn {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 8px !important;
+        padding: 7px !important;
+    }
+
+    .global-pill-btn {
+        padding: 5px 9px !important;
+        font-size: 0.74rem !important;
+        gap: 4px !important;
+    }
+
+    .region-picker {
+        padding: 5px 8px !important;
+        font-size: 0.74rem !important;
+        gap: 4px !important;
+    }
+
+    #region-select {
+        font-size: 0.74rem !important;
+    }
+
+    .category-tabs {
+        bottom: 6px !important;
+        padding: 5px 6px !important;
+        gap: 3px !important;
+    }
+
+    .category-tab {
+        padding: 5px 8px !important;
+        font-size: 0.72rem !important;
+    }
+
+    .container {
+        padding: 1rem 0.6rem 5rem !important;
+    }
+
+    .reader-nav {
+        padding: 0.65rem 0.6rem !important;
+    }
+
+    .back-link {
+        padding: 5px 8px !important;
+        font-size: 0.76rem !important;
+    }
+
+    .reader-logo {
+        font-size: 1.1rem !important;
     }
 }
