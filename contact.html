@@ -81,7 +81,7 @@
             <a href="terms.html" class="drawer-link-sub"><i class="fas fa-file-contract"></i> Terms of Service</a>
         </nav>
         <div class="mobile-drawer-footer">
-            <a href="mailto:trendwaveyoutube@gmail.com" class="drawer-email-btn">
+            <a href="https://mail.google.com/mail/?view=cm&to=trendwaveyoutube@gmail.com" target="_blank" rel="noopener noreferrer" class="drawer-email-btn">
                 <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
             </a>
         </div>
@@ -104,7 +104,7 @@
                     <div class="contact-info-text">
                         <h3>Direct Email</h3>
                         <p>For all inquiries, contact us directly at:</p>
-                        <p><a href="mailto:trendwaveyoutube@gmail.com">trendwaveyoutube@gmail.com</a></p>
+                        <p><a href="https://mail.google.com/mail/?view=cm&to=trendwaveyoutube@gmail.com" target="_blank" rel="noopener noreferrer">trendwaveyoutube@gmail.com</a></p>
                     </div>
                 </div>
 
@@ -213,7 +213,7 @@
                 <h4>Support & Feedback</h4>
                 <div class="footer-contact-info">
                     <p>Have a question or feedback? We'd love to hear from you.</p>
-                    <a href="mailto:trendwaveyoutube@gmail.com" class="footer-email-btn">
+                    <a href="https://mail.google.com/mail/?view=cm&to=trendwaveyoutube@gmail.com" target="_blank" rel="noopener noreferrer" class="footer-email-btn">
                         <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
                     </a>
                 </div>
@@ -264,19 +264,19 @@
 
             if (!name || !email || !message) return;
 
-            // Prepare email client mailto URL
+            // Build Gmail compose URL with pre-filled fields
             const subject = encodeURIComponent(`[TrendWave] ${category} - from ${name}`);
             const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${category}\n\nMessage:\n${message}`);
-            const mailtoUrl = `mailto:trendwaveyoutube@gmail.com?subject=${subject}&body=${body}`;
+            const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&to=trendwaveyoutube@gmail.com&su=${subject}&body=${body}`;
 
             formFeedback.style.display = 'block';
             formFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
             formFeedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
             formFeedback.style.color = '#10b981';
-            formFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Opening your email client to dispatch message. You can also email us directly at <strong>trendwaveyoutube@gmail.com</strong>.';
+            formFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Opening Gmail compose in a new tab. Please review and click <strong>Send</strong> in Gmail to deliver your message.';
 
             setTimeout(() => {
-                window.location.href = mailtoUrl;
+                window.open(gmailComposeUrl, '_blank', 'noopener,noreferrer');
             }, 600);
         });
 
