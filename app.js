@@ -504,6 +504,28 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchTrendingVideos(region, currentCategory, isGlobal);
     });
 
+    // Homepage FAQ Accordion Functionality
+    const homeFaqQuestions = document.querySelectorAll('#home-faq-accordion .faq-question');
+    homeFaqQuestions.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.closest('.faq-item');
+            const isOpen = item.classList.contains('open');
+
+            // Close other items for a clean accordion effect
+            document.querySelectorAll('#home-faq-accordion .faq-item').forEach(i => {
+                i.classList.remove('open');
+                const b = i.querySelector('.faq-question');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            });
+
+            // Toggle selected item
+            if (!isOpen) {
+                item.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
 });
