@@ -8,9 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentDateEl = document.getElementById('current-date');
     const regionSelect = document.getElementById('region-select');
 
-    // Set dynamic current date
+    // Set dynamic current date in header
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     currentDateEl.textContent = new Date().toLocaleDateString('en-US', dateOptions);
+
+    // Scroll-based hide/show for bottom category bar
+    const categoryBar = document.getElementById('category-tabs');
+    let lastScrollY = window.scrollY;
+    let scrollTicking = false;
+
+    window.addEventListener('scroll', () => {
+        if (!scrollTicking) {
+            window.requestAnimationFrame(() => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    // Scrolling down — hide the bar
+                    categoryBar.classList.add('tabs-hidden');
+                } else {
+                    // Scrolling up — show the bar
+                    categoryBar.classList.remove('tabs-hidden');
+                }
+                lastScrollY = currentScrollY;
+                scrollTicking = false;
+            });
+            scrollTicking = true;
+        }
+    });
 
     // Region Management
     const savedRegion = localStorage.getItem('trendwave_region') || 'IN';

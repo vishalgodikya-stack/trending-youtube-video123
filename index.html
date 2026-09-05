@@ -40,20 +40,12 @@
                     <option value="BR">🇧🇷 Brazil</option>
                 </select>
             </div>
+            <span class="header-date" id="current-date"></span>
             <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
                 <i class="fas fa-moon"></i>
             </div>
         </div>
     </header>
-
-    <nav class="category-tabs">
-        <button class="category-tab active" data-category="all">Trending</button>
-        <button class="category-tab" data-category="music">Music</button>
-        <button class="category-tab" data-category="gaming">Gaming</button>
-        <button class="category-tab" data-category="news">News</button>
-        <button class="category-tab" data-category="tech">Tech</button>
-        <button class="category-tab" data-category="entertainment">Entertainment</button>
-    </nav>
 
     <main class="container">
         <div id="loader" class="loader-container">
@@ -72,11 +64,15 @@
         </div>
     </main>
 
-    <footer class="glass-footer">
-        <p>Curated automatically &bull; <span id="current-date"></span></p>
-    </footer>
+    <nav class="category-tabs" id="category-tabs">
+        <button class="category-tab active" data-category="all">Trending</button>
+        <button class="category-tab" data-category="music">Music</button>
+        <button class="category-tab" data-category="gaming">Gaming</button>
+        <button class="category-tab" data-category="news">News</button>
+        <button class="category-tab" data-category="tech">Tech</button>
+        <button class="category-tab" data-category="entertainment">Entertainment</button>
+    </nav>
 
     <script src="app.js"></script>
 </body>
 </html>
-
