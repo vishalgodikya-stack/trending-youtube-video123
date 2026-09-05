@@ -504,6 +504,63 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchTrendingVideos(region, currentCategory, isGlobal);
     });
 
+    // FAQ Modal & Accordion Functionality
+    const faqBtn = document.getElementById('faq-btn');
+    const faqModal = document.getElementById('faq-modal');
+    const faqCloseBtn = document.getElementById('faq-close-btn');
+    const faqQuestions = document.querySelectorAll('.faq-question');
+
+    const openFaqModal = () => {
+        if (faqModal) {
+            faqModal.classList.remove('hidden');
+            faqModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    const closeFaqModal = () => {
+        if (faqModal) {
+            faqModal.classList.add('hidden');
+            faqModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+    };
+
+    if (faqBtn) faqBtn.addEventListener('click', openFaqModal);
+    if (faqCloseBtn) faqCloseBtn.addEventListener('click', closeFaqModal);
+
+    // Close modal when clicking outside on the backdrop
+    if (faqModal) {
+        faqModal.addEventListener('click', (e) => {
+            if (e.target === faqModal) {
+                closeFaqModal();
+            }
+        });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && faqModal && !faqModal.classList.contains('hidden')) {
+            closeFaqModal();
+        }
+    });
+
+    // FAQ Accordion Toggle
+    faqQuestions.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.closest('.faq-item');
+            const isOpen = item.classList.contains('open');
+
+            // Close other items for a clean accordion effect
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+            // Toggle selected item
+            if (!isOpen) {
+                item.classList.add('open');
+            }
+        });
+    });
+
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
 });

@@ -44,6 +44,9 @@
                 </select>
             </div>
             <span class="header-date" id="current-date"></span>
+            <button id="faq-btn" class="icon-pill-btn" title="Frequently Asked Questions">
+                <i class="fas fa-question-circle"></i> FAQ
+            </button>
             <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
                 <i class="fas fa-moon"></i>
             </div>
@@ -75,6 +78,69 @@
         <button class="category-tab" data-category="tech">Tech</button>
         <button class="category-tab" data-category="entertainment">Entertainment</button>
     </nav>
+
+    <!-- FAQ Glassmorphic Modal Overlay -->
+    <div id="faq-modal" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="faq-modal-title">
+            <div class="modal-header">
+                <h2 id="faq-modal-title"><i class="fas fa-question-circle highlight"></i> Frequently Asked Questions</h2>
+                <button id="faq-close-btn" class="modal-close-btn" aria-label="Close FAQ Modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="faq-accordion">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What is TrendWave?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>TrendWave is a real-time, distraction-free dashboard designed to discover what the world is actually watching on YouTube today. It cuts through algorithm clutter to surface genuine viral topics and top-performing releases across global and regional markets.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How are trending videos ranked and filtered?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We enforce strict quality standards: videos must be uploaded within the last 24 hours (present day), have a minimum of 5,000 views, and cannot be active livestreams. Qualified videos are ranked strictly from highest to lowest view count so you see the biggest hits first.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What is the difference between Regional and Global mode?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p><strong>Regional Mode</strong> tracks localized trends in countries like India, the US, or the UK. <strong>Global Mode</strong> eliminates regional television broadcasts, soap operas, and local scripts to aggregate universally recognized international hits (like Billboard singles, movie trailers, and global creator events) with a higher 50K+ view floor.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Why does clicking a card explore the topic on YouTube?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Clicking any video card searches YouTube directly for that specific trending topic, allowing you to see multiple creator perspectives, analysis, and reactions instead of getting trapped in a single video's sidebar recommendations. To watch the video directly, simply click the dedicated <strong>Watch</strong> button on the card!</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is any personal login or account required?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No! TrendWave is 100% privacy-friendly. No Google account, login, or tracking cookies are used. Your dark/light theme and region preferences are stored solely on your local device via localStorage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
