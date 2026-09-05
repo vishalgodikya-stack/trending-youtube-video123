@@ -640,6 +640,13 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', closeDrawer);
     });
 
+    // Close drawer on Escape key for desktop accessibility
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileDrawer && mobileDrawer.classList.contains('open')) {
+            closeDrawer();
+        }
+    });
+
     // Top Quick Guide / Answers Scroll Handler
     if (topGuideToggleBtn) {
         topGuideToggleBtn.addEventListener('click', () => {

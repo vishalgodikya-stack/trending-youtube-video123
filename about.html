@@ -52,8 +52,40 @@
             <div class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark Theme">
                 <i class="fas fa-moon"></i>
             </div>
+            <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Open Navigation Menu" title="Navigation Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
+
+    <!-- Slide-out Drawer Navigation -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay"></div>
+    <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <div class="drawer-logo">
+                <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+            </div>
+            <button id="close-drawer-btn" class="close-drawer-btn" aria-label="Close Navigation Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="mobile-drawer-nav">
+            <a href="index.html" class="drawer-link"><i class="fas fa-fire" style="color: #ff0055;"></i> Trending Feed</a>
+            <a href="faq.html" class="drawer-link"><i class="fas fa-question-circle"></i> Quick Answers & FAQ</a>
+            <a href="about.html" class="drawer-link active"><i class="fas fa-info-circle"></i> About Us</a>
+            <a href="contact.html" class="drawer-link"><i class="fas fa-envelope"></i> Contact Us</a>
+            <div class="drawer-divider"></div>
+            <a href="privacy.html" class="drawer-link-sub"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="terms.html" class="drawer-link-sub"><i class="fas fa-file-contract"></i> Terms of Service</a>
+        </nav>
+        <div class="mobile-drawer-footer">
+            <a href="mailto:trendwaveyoutube@gmail.com" class="drawer-email-btn">
+                <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
+            </a>
+        </div>
+    </aside>
 
     <main class="reader-container">
         <header class="reader-hero">
@@ -202,6 +234,38 @@
                 icon.classList.replace('fa-sun', 'fa-moon');
                 localStorage.setItem('theme', 'dark');
             }
+        });
+
+        // Navigation Drawer Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeDrawerBtn = document.getElementById('close-drawer-btn');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+        const mobileDrawerOverlay = document.getElementById('mobile-drawer-overlay');
+
+        const openDrawer = () => {
+            if (mobileDrawer) {
+                mobileDrawer.classList.add('open');
+                mobileDrawer.setAttribute('aria-hidden', 'false');
+            }
+            if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeDrawer = () => {
+            if (mobileDrawer) {
+                mobileDrawer.classList.remove('open');
+                mobileDrawer.setAttribute('aria-hidden', 'true');
+            }
+            if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openDrawer);
+        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+        if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener('click', closeDrawer);
+        document.querySelectorAll('.drawer-link, .drawer-link-sub').forEach(l => l.addEventListener('click', closeDrawer));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileDrawer && mobileDrawer.classList.contains('open')) closeDrawer();
         });
     </script>
 </body>
