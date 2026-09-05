@@ -168,6 +168,157 @@ document.addEventListener('DOMContentLoaded', () => {
             .trim() || title;
     };
 
+    // Normalize titles to detect duplicate uploads, mirrors, and re-broadcasts
+    const normalizeTitle = (title) => {
+        if (!title) return '';
+        return title
+            .toLowerCase()
+            .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu, '')
+            .replace(/\b(live|stream|official video|official music video|full episode|4k|hd|2026)\b/gi, '')
+            .replace(/[^a-z0-9]/g, '')
+            .trim();
+    };
+
+    // Extract significant keywords from a title for semantic topic duplicate detection
+    const extractTitleKeywords = (title) => {
+        if (!title) return new Set();
+        const stopWords = new Set([
+            'with', 'from', 'this', 'that', 'live', 'video', 'watch', 'today',
+            'highlights', 'stream', 'full', 'part', '2026', '2025', 'hindi',
+            'official', 'match', 'free', 'news', 'update', 'status'
+        ]);
+        const clean = title.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+        const tokens = clean.split(/\s+/).filter(w => w.length >= 3 && !stopWords.has(w));
+        return new Set(tokens);
+    };
+
+    // Strict multi-layer deduplication across Video ID, URL, Channel+Title, and same-channel topic overlap
+    const deduplicateVideos = (videos) => {
+        if (!Array.isArray(videos)) return [];
+        const seenIds = new Set();
+        const seenUrls = new Set();
+        const seenTitleKeys = new Set();
+        const seenChannelKeywords = new Map();
+        const unique = [];
+
+        for (const video of videos) {
+            if (!video) continue;
+
+            const videoId = extractVideoId(video);
+            const rawUrl = (video.url || '').trim();
+            const rawTitle = (video.title || '').trim();
+            const normTitle = normalizeTitle(rawTitle);
+            const uploader = (video.uploaderName || '').toLowerCase().trim();
+            const uploaderTitleKey = uploader && normTitle ? `${uploader}:::${normTitle}` : null;
+            const titleOnlyKey = normTitle && normTitle.length >= 14 ? `title:::${normTitle}` : null;
+
+            // 1. Check Video ID collision (e.g. hvES4oRiYM4)
+            if (videoId && seenIds.has(videoId)) continue;
+
+            // 2. Check full raw URL collision
+            if (rawUrl && seenUrls.has(rawUrl)) continue;
+
+            // 3. Check Channel + Title collision (same channel re-upload / identical title)
+            if (uploaderTitleKey && seenTitleKeys.has(uploaderTitleKey)) continue;
+
+            // 4. Check Identical Normalized Title collision (broadcast mirrors)
+            if (titleOnlyKey && seenTitleKeys.has(titleOnlyKey)) continue;
+
+            // 5. Check Same-Channel Topic Overlap (same channel posting multiple live streams/clips for the exact same event)
+            if (uploader) {
+                const currentKeywords = extractTitleKeywords(rawTitle);
+                if (currentKeywords.size >= 2 && seenChannelKeywords.has(uploader)) {
+                    const prevKeywordSets = seenChannelKeywords.get(uploader);
+                    let isTopicDuplicate = false;
+                    for (const prevSet of prevKeywordSets) {
+                        let commonCount = 0;
+                        for (const kw of currentKeywords) {
+                            if (prevSet.has(kw)) commonCount++;
+                        }
+                        if (commonCount >= 2) {
+                            isTopicDuplicate = true;
+                            break;
+                        }
+                    }
+                    if (isTopicDuplicate) continue;
+                }
+
+                if (!seenChannelKeywords.has(uploader)) {
+                    seenChannelKeywords.set(uploader, []);
+                }
+                seenChannelKeywords.get(uploader).push(currentKeywords);
+            }
+
+            // Mark identifiers as seen
+            if (videoId) seenIds.add(videoId);
+            if (rawUrl) seenUrls.add(rawUrl);
+            if (uploaderTitleKey) seenTitleKeys.add(uploaderTitleKey);
+            if (titleOnlyKey) seenTitleKeys.add(titleOnlyKey);
+
+            unique.push(video);
+        }
+
+        return unique;
+    };
+
+    // Ensure creator and topic diversity across the feed:
+    // 1. In the initial top 6 batch: strictly maximum 1 video per channel/creator
+    // 2. Throughout the rest of the feed: prevent back-to-back consecutive videos from the same creator
+    const diversifyFeed = (videos) => {
+        if (!Array.isArray(videos) || videos.length <= 1) return videos;
+
+        const topBatch = [];
+        const rest = [];
+        const seenTopChannels = new Set();
+
+        for (const video of videos) {
+            const uploader = (video.uploaderName || '').toLowerCase().trim();
+            if (topBatch.length < 6 && uploader && !seenTopChannels.has(uploader)) {
+                topBatch.push(video);
+                seenTopChannels.add(uploader);
+            } else {
+                rest.push(video);
+            }
+        }
+
+        // Interleave remaining videos to avoid consecutive videos from the same creator
+        const interleaved = [...topBatch];
+        const deferred = [];
+
+        for (const video of rest) {
+            const currUploader = (video.uploaderName || '').toLowerCase().trim();
+            const lastUploader = interleaved.length > 0
+                ? (interleaved[interleaved.length - 1].uploaderName || '').toLowerCase().trim()
+                : '';
+
+            if (!currUploader || currUploader !== lastUploader) {
+                interleaved.push(video);
+            } else {
+                deferred.push(video);
+            }
+        }
+
+        // Safely re-insert any deferred videos where adjacent channels differ
+        for (const video of deferred) {
+            const currUploader = (video.uploaderName || '').toLowerCase().trim();
+            let inserted = false;
+            for (let i = 6; i < interleaved.length; i++) {
+                const prevUploader = (interleaved[i - 1].uploaderName || '').toLowerCase().trim();
+                const nextUploader = (interleaved[i].uploaderName || '').toLowerCase().trim();
+                if (currUploader !== prevUploader && currUploader !== nextUploader) {
+                    interleaved.splice(i, 0, video);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) {
+                interleaved.push(video);
+            }
+        }
+
+        return interleaved;
+    };
+
     // Verified public Piped instances with CORS enabled
     const API_INSTANCES = [
         'https://api.piped.private.coffee',
@@ -320,16 +471,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const countryName = REGION_NAMES[region] || 'India';
         const candidatePool = [];
+        const seenIds = new Set();
         const seenUrls = new Set();
+        const seenTitleKeys = new Set();
 
         const addCandidates = (items, fromTrending = false) => {
             if (!Array.isArray(items)) return;
             items.forEach(item => {
-                if (item && item.url && !seenUrls.has(item.url)) {
-                    seenUrls.add(item.url);
-                    item.fromTrending = fromTrending;
-                    candidatePool.push(item);
-                }
+                if (!item) return;
+
+                const videoId = extractVideoId(item);
+                const rawUrl = (item.url || '').trim();
+                const rawTitle = (item.title || '').trim();
+                const normTitle = normalizeTitle(rawTitle);
+                const uploader = (item.uploaderName || '').toLowerCase().trim();
+                const uploaderTitleKey = uploader && normTitle ? `${uploader}:::${normTitle}` : null;
+                const titleOnlyKey = normTitle && normTitle.length >= 14 ? `title:::${normTitle}` : null;
+
+                // 1. Check Video ID collision
+                if (videoId && seenIds.has(videoId)) return;
+
+                // 2. Check URL collision
+                if (rawUrl && seenUrls.has(rawUrl)) return;
+
+                // 3. Check Channel + Title collision
+                if (uploaderTitleKey && seenTitleKeys.has(uploaderTitleKey)) return;
+
+                // 4. Check Normalized Title collision
+                if (titleOnlyKey && seenTitleKeys.has(titleOnlyKey)) return;
+
+                // Mark identifiers as seen
+                if (videoId) seenIds.add(videoId);
+                if (rawUrl) seenUrls.add(rawUrl);
+                if (uploaderTitleKey) seenTitleKeys.add(uploaderTitleKey);
+                if (titleOnlyKey) seenTitleKeys.add(titleOnlyKey);
+
+                item.fromTrending = fromTrending;
+                candidatePool.push(item);
             });
         };
 
@@ -384,8 +562,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 filtered = candidates;
             }
 
-            // Sort strictly from HIGH to LOW by view count
+            // Deduplicate, sort strictly from HIGH to LOW by view count, and diversify feed
+            filtered = deduplicateVideos(filtered);
             filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
+            filtered = diversifyFeed(deduplicateVideos(filtered));
 
             hideLoader();
 
@@ -432,11 +612,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // 3. Tier 2 Smart Fallback: If fewer than 8 videos qualify, automatically relax to all official trending videos
             if (filtered.length < 8) {
                 console.log(`Tier 1 yielded only ${filtered.length} videos. Activating smart fallback for ${countryName}.`);
+                const existingIds = new Set(filtered.map(v => extractVideoId(v)).filter(Boolean));
                 const existingUrls = new Set(filtered.map(v => v.url));
                 candidates.forEach(v => {
-                    if (!existingUrls.has(v.url)) {
+                    const vId = extractVideoId(v);
+                    if (!existingUrls.has(v.url) && (!vId || !existingIds.has(vId))) {
                         if (v.fromTrending || (Number(v.views) || 0) >= 500) {
                             existingUrls.add(v.url);
+                            if (vId) existingIds.add(vId);
                             filtered.push(v);
                         }
                     }
@@ -448,8 +631,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 filtered = candidates;
             }
 
-            // Sort strictly from HIGH to LOW by view count
+            // Deduplicate, sort strictly from HIGH to LOW by view count, and diversify feed
+            filtered = deduplicateVideos(filtered);
             filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
+            filtered = diversifyFeed(deduplicateVideos(filtered));
 
             hideLoader();
 
@@ -568,9 +753,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Render Logic
+    // Render Logic with Final Guard against Duplicate Video Cards and Creator Bursts
     const renderVideos = (videos) => {
-        currentFilteredVideos = videos.slice(0, 36);
+        const uniqueVideos = diversifyFeed(deduplicateVideos(videos));
+        currentFilteredVideos = uniqueVideos.slice(0, 36);
         displayedVideoCount = 0;
         videoGrid.innerHTML = '';
         renderNextVideoBatch();
