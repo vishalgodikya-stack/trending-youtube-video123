@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | TrendWave - Real-Time YouTube Trends</title>
+    <meta name="description" content="Get in touch with the TrendWave team for inquiries, feedback, feature requests, advertising, or copyright questions.">
+    <meta name="keywords" content="Contact TrendWave, TrendWave support, YouTube trends inquiries, feedback">
+    <link rel="canonical" href="https://trendwaveyoutube.vercel.app/contact.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trendwaveyoutube.vercel.app/contact.html">
+    <meta property="og:title" content="Contact Us | TrendWave">
+    <meta property="og:description" content="Reach out to the TrendWave team for general inquiries, feedback, partnerships, or copyright questions.">
+    <meta property="og:image" content="https://trendwaveyoutube.vercel.app/web-app-manifest-512x512.png">
+    <meta property="og:site_name" content="TrendWave">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact Us | TrendWave">
+    <meta name="twitter:description" content="Reach out to the TrendWave team for general inquiries, feedback, partnerships, or copyright questions.">
+    <meta name="twitter:image" content="https://trendwaveyoutube.vercel.app/web-app-manifest-512x512.png">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="reader-nav">
+        <a href="index.html" class="back-link" title="Return to Trending Grid">
+            <i class="fas fa-arrow-left"></i> Back to Trends
+        </a>
+        <a href="index.html" class="reader-logo">
+            <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+        </a>
+        <div class="reader-nav-controls">
+            <div class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark Theme">
+                <i class="fas fa-moon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main class="reader-container wide">
+        <header class="reader-hero">
+            <span class="reader-badge"><i class="fas fa-envelope-open-text"></i> Get In Touch</span>
+            <h1>Contact Us</h1>
+            <p>Have a question about how our trending algorithm works, noticed a bug, want to discuss an advertising opportunity, or have copyright inquiries? We're here to assist.</p>
+        </header>
+
+        <div class="contact-grid">
+            <!-- Left Info Column -->
+            <div class="contact-info-list">
+                <div class="contact-info-item">
+                    <div class="contact-icon-bubble">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-info-text">
+                        <h3>Direct Email</h3>
+                        <p>For all inquiries, contact us directly at:</p>
+                        <p><a href="mailto:contact.trendwave@gmail.com">contact.trendwave@gmail.com</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="contact-icon-bubble">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="contact-info-text">
+                        <h3>Response Time</h3>
+                        <p>We review every message and strive to respond within <strong>24 to 48 business hours</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="contact-icon-bubble">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="contact-info-text">
+                        <h3>DMCA & Copyright</h3>
+                        <p>For intellectual property notices, please include specific video links and refer to our <a href="terms.html#dmca">DMCA Policy</a>.</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="contact-icon-bubble">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="contact-info-text">
+                        <h3>Need Instant Answers?</h3>
+                        <p>Check out our <a href="faq.html">FAQ Page</a> for explanations on our filters, regional coverage, and ranking criteria.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Form Column -->
+            <div class="contact-form-card">
+                <h2 style="font-size: 1.3rem; margin-bottom: 1.2rem; color: var(--text-primary);"><i class="fas fa-paper-plane" style="color: #ff0055; margin-right: 8px;"></i> Send Us a Message</h2>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label class="form-label" for="contact-name">Your Name</label>
+                        <input type="text" id="contact-name" class="form-input" placeholder="e.g. Alex Smith" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contact-email">Email Address</label>
+                        <input type="email" id="contact-email" class="form-input" placeholder="alex@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contact-category">Inquiry Subject</label>
+                        <select id="contact-category" class="form-select" required>
+                            <option value="General Question">General Question</option>
+                            <option value="Feature Suggestion">Feature Suggestion / Idea</option>
+                            <option value="Bug Report">Bug Report</option>
+                            <option value="Advertising & Sponsorship">Advertising & Sponsorship</option>
+                            <option value="DMCA & Copyright">DMCA / Copyright Notice</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contact-message">Message</label>
+                        <textarea id="contact-message" class="form-textarea" placeholder="How can we help you?" required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="contact-submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                    <div id="form-feedback" style="display: none; margin-top: 1.2rem; padding: 12px 16px; border-radius: 12px; font-size: 0.92rem; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="footer-logo">
+                    <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+                </a>
+                <p>Real-time trending YouTube videos today without personal algorithmic bias. Explore viral phenomena across global charts instantly.</p>
+                <span class="footer-badge-pill"><i class="fas fa-circle"></i> Live Global Stream</span>
+            </div>
+
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home Trends</a></li>
+                    <li><a href="faq.html"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About Us</a></li>
+                    <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal & Policies</h4>
+                <ul class="footer-links">
+                    <li><a href="privacy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                    <li><a href="terms.html"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="terms.html#dmca"><i class="fas fa-balance-scale"></i> DMCA & Fair Use</a></li>
+                    <li><a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer"><i class="fas fa-ad"></i> Ad Choices</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Support & Feedback</h4>
+                <div class="footer-contact-info">
+                    <p>Have a question or feedback? We'd love to hear from you.</p>
+                    <a href="mailto:contact.trendwave@gmail.com" class="footer-email-btn">
+                        <i class="fas fa-paper-plane"></i> contact.trendwave@gmail.com
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-copy">
+                &copy; 2026 TrendWave. All rights reserved.
+            </div>
+            <div class="footer-disclaimer">
+                TrendWave is an independent platform and is not affiliated, endorsed, or partnered with YouTube&trade; or Google LLC. YouTube&trade; is a registered trademark of Google LLC.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sync theme with localStorage
+        const themeToggle = document.getElementById('theme-toggle');
+        const icon = themeToggle.querySelector('i');
+
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Contact form handling with direct mailto fallback
+        const contactForm = document.getElementById('contact-form');
+        const formFeedback = document.getElementById('form-feedback');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const category = document.getElementById('contact-category').value;
+            const message = document.getElementById('contact-message').value.trim();
+
+            if (!name || !email || !message) return;
+
+            // Prepare email client mailto URL
+            const subject = encodeURIComponent(`[TrendWave] ${category} - from ${name}`);
+            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${category}\n\nMessage:\n${message}`);
+            const mailtoUrl = `mailto:contact.trendwave@gmail.com?subject=${subject}&body=${body}`;
+
+            formFeedback.style.display = 'block';
+            formFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
+            formFeedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            formFeedback.style.color = '#10b981';
+            formFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Opening your email client to dispatch message. You can also email us directly at <strong>contact.trendwave@gmail.com</strong>.';
+
+            setTimeout(() => {
+                window.location.href = mailtoUrl;
+            }, 600);
+        });
+    </script>
+</body>
+</html>

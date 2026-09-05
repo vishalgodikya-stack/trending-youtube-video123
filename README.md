@@ -10,7 +10,7 @@
 
 **Discover and explore today's hottest YouTube trends with a sleek, real-time glassmorphic dashboard.**
 
-[View Live Demo](https://video123.vercel.app/) • [Report Bug](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues) • [Request Feature](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues)
+[View Live Demo](https://trendwaveyoutube.vercel.app/) • [Report Bug](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues) • [Request Feature](https://github.com/vishalgodikya-stack/trending-youtube-video123/issues)
 
 </div>
 
