@@ -110,36 +110,79 @@
             <p>Today's hottest YouTube trends & topics</p>
         </div>
         <div class="header-controls">
-            <button id="global-toggle-btn" class="global-pill-btn" title="Toggle Worldwide Trending">
-                <i class="fas fa-globe-americas"></i> Global
-            </button>
-            <div class="region-picker" id="region-picker-container" title="Change Trending Region">
-                <i class="fas fa-map-marker-alt"></i>
-                <select id="region-select" aria-label="Select Region">
-                    <option value="IN">🇮🇳 India</option>
-                    <option value="US">🇺🇸 United States</option>
-                    <option value="GB">🇬🇧 United Kingdom</option>
-                    <option value="CA">🇨🇦 Canada</option>
-                    <option value="AU">🇦🇺 Australia</option>
-                    <option value="JP">🇯🇵 Japan</option>
-                    <option value="DE">🇩🇪 Germany</option>
-                    <option value="BR">🇧🇷 Brazil</option>
-                </select>
+            <div class="header-filter-group">
+                <button id="global-toggle-btn" class="global-pill-btn" title="Toggle Worldwide Trending">
+                    <i class="fas fa-globe-americas"></i> Global
+                </button>
+                <div class="region-picker" id="region-picker-container" title="Change Trending Region">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <select id="region-select" aria-label="Select Region">
+                        <option value="IN">🇮🇳 India</option>
+                        <option value="US">🇺🇸 United States</option>
+                        <option value="GB">🇬🇧 United Kingdom</option>
+                        <option value="CA">🇨🇦 Canada</option>
+                        <option value="AU">🇦🇺 Australia</option>
+                        <option value="JP">🇯🇵 Japan</option>
+                        <option value="DE">🇩🇪 Germany</option>
+                        <option value="BR">🇧🇷 Brazil</option>
+                    </select>
+                </div>
             </div>
             <span class="header-date" id="current-date"></span>
-            <a href="about.html" class="icon-pill-btn" title="About TrendWave">
+            <a href="about.html" class="icon-pill-btn desktop-only" title="About TrendWave">
                 <i class="fas fa-info-circle"></i> About
             </a>
-            <a href="faq.html" class="icon-pill-btn" title="Frequently Asked Questions">
+            <a href="faq.html" class="icon-pill-btn desktop-only" title="Frequently Asked Questions">
                 <i class="fas fa-question-circle"></i> FAQ
             </a>
             <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
                 <i class="fas fa-moon"></i>
             </div>
+            <!-- Mobile 3-line Hamburger Menu Button -->
+            <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Open Navigation Menu" title="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
+    <!-- Mobile Slide-out Drawer Navigation -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay"></div>
+    <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <div class="drawer-logo">
+                <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+            </div>
+            <button id="close-drawer-btn" class="close-drawer-btn" aria-label="Close Navigation Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="mobile-drawer-nav">
+            <a href="index.html" class="drawer-link active"><i class="fas fa-fire" style="color: #ff0055;"></i> Trending Feed</a>
+            <a href="faq.html" class="drawer-link"><i class="fas fa-question-circle"></i> Quick Answers & FAQ</a>
+            <a href="about.html" class="drawer-link"><i class="fas fa-info-circle"></i> About Us</a>
+            <a href="contact.html" class="drawer-link"><i class="fas fa-envelope"></i> Contact Us</a>
+            <div class="drawer-divider"></div>
+            <a href="privacy.html" class="drawer-link-sub"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="terms.html" class="drawer-link-sub"><i class="fas fa-file-contract"></i> Terms of Service</a>
+        </nav>
+        <div class="mobile-drawer-footer">
+            <a href="mailto:trendwaveyoutube@gmail.com" class="drawer-email-btn">
+                <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
+            </a>
+        </div>
+    </aside>
+
     <main class="container">
+        <!-- Compact Quick Guide / Answers Bar at the Top -->
+        <div class="top-guide-bar">
+            <button id="top-guide-toggle-btn" class="top-guide-btn" title="View Quick Answers & Trend Guide">
+                <span><i class="fas fa-bolt" style="color: #ff0055;"></i> Quick Answers & Trend Guide</span>
+                <i class="fas fa-chevron-down toggle-chevron"></i>
+            </button>
+        </div>
+
         <div id="loader" class="loader-container">
             <div class="spinner"></div>
             <p>Riding the wave...</p>
@@ -155,34 +198,80 @@
             <!-- Video cards will be injected here dynamically -->
         </div>
 
-        <!-- SEO Informative Section -->
-        <section class="seo-section" aria-label="About TrendWave and Trending YouTube Videos">
+        <!-- Load More Videos Action -->
+        <div id="load-more-container" class="load-more-container hidden">
+            <button id="load-more-btn" class="load-more-button">
+                <i class="fas fa-plus-circle"></i> Load More Trending Videos
+            </button>
+        </div>
+
+        <!-- SEO Informative Accordion Section -->
+        <section class="seo-section" id="seo-guide-section" aria-label="About TrendWave and Trending YouTube Videos">
             <div class="seo-card">
-                <h2>Discover Trending YouTube Videos Today on TrendWave</h2>
-                <p>Every single second, thousands of hours of video footage are uploaded to the internet, making YouTube the undisputed town square of modern digital entertainment, culture, and breaking information. However, finding genuine <strong>trending youtube videos today</strong> has become increasingly challenging for everyday internet users. Official platform homepages and explore tabs are driven almost entirely by personalized recommendation algorithms designed to trap you in an echo chamber of past viewing habits. When you want to see what the rest of the world is actually talking about, you need an objective, real-time lens. That is why TrendWave was created: to deliver a transparent, lightning-fast dashboard dedicated to surfacing the most viral <strong>trending youtube videos right now</strong> across categories and regions.</p>
+                <div class="faq-section-header">
+                    <span class="faq-badge"><i class="fas fa-book-reader"></i> Comprehensive Guide</span>
+                    <h2>Discover Trending YouTube Videos Today on TrendWave</h2>
+                    <p>Every single second, thousands of hours of video footage are uploaded to the internet, making YouTube the undisputed town square of modern digital entertainment, culture, and breaking information. However, finding genuine <strong>trending youtube videos today</strong> has become increasingly challenging for everyday internet users. Official platform homepages and explore tabs are driven almost entirely by personalized recommendation algorithms designed to trap you in an echo chamber of past viewing habits. When you want to see what the rest of the world is actually talking about, you need an objective, real-time lens. That is why TrendWave was created: to deliver a transparent, lightning-fast dashboard dedicated to surfacing the most viral <strong>trending youtube videos right now</strong> across categories and regions.</p>
+                </div>
                 
-                <h3>Why Tracking Top Trending YouTube Videos Right Now Matters</h3>
-                <p>From record-breaking music video premieres and blockbuster movie trailers to breaking global news, grassroots creator spectacles, and competitive esports showdowns, <strong>top trending youtube videos</strong> capture the cultural pulse of our modern time. Whether you are a digital content creator researching current audience interests, a digital marketer tracking high-velocity memes, or simply an avid viewer who loves staying ahead of the curve, having direct access to <strong>trending youtube videos today</strong> gives you an undeniable advantage. TrendWave eliminates the clutter, clickbait loops, and repetitive autoplay traps, offering a clean, distraction-free glassmorphic grid that updates dynamically with the latest online conversations.</p>
+                <div class="faq-accordion" id="seo-guide-accordion">
+                    <div class="faq-item">
+                        <button class="faq-question" aria-expanded="false">
+                            <span>Why Tracking Top Trending YouTube Videos Right Now Matters</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>From record-breaking music video premieres and blockbuster movie trailers to breaking global news, grassroots creator spectacles, and competitive esports showdowns, <strong>top trending youtube videos</strong> capture the cultural pulse of our modern time. Whether you are a digital content creator researching current audience interests, a digital marketer tracking high-velocity memes, or simply an avid viewer who loves staying ahead of the curve, having direct access to <strong>trending youtube videos today</strong> gives you an undeniable advantage. TrendWave eliminates the clutter, clickbait loops, and repetitive autoplay traps, offering a clean, distraction-free glassmorphic grid that updates dynamically with the latest online conversations.</p>
+                        </div>
+                    </div>
 
-                <h3>How TrendWave Ranks and Filters Trending YouTube Videos Today</h3>
-                <p>Not every high-view clip qualifies as genuinely viral or timely. YouTube's native Explore feeds are frequently flooded with hours-long live streams that report temporary viewer spikes rather than true viral momentum. TrendWave utilizes a multi-stage intelligent curation engine designed to filter out the noise and display only <strong>top trending youtube videos</strong>:</p>
-                
-                <ul class="seo-features-list">
-                    <li><strong>Strict 24-Hour Freshness Window:</strong> Video velocity matters. We strictly focus on <strong>trending youtube videos</strong> uploaded within the last 24 hours, ensuring you are seeing today's newest viral sensations rather than recycled uploads from weeks or months ago.</li>
-                    <li><strong>5,000+ Verified View Floor:</strong> To protect your feed from low-quality spam, automated uploads, and arbitrary recommendations, every video on TrendWave must cross a verified view threshold before qualifying.</li>
-                    <li><strong>Complete Livestream Filtering:</strong> By excluding active live streams that display temporary concurrent viewer counts, our charts preserve authentic viral metrics.</li>
-                    <li><strong>Ranked High to Low by Velocity:</strong> All qualified <strong>trending youtube videos right now</strong> are sorted in descending order based on verified views, putting the biggest cultural blockbusters directly at the top of your screen.</li>
-                </ul>
+                    <div class="faq-item">
+                        <button class="faq-question" aria-expanded="false">
+                            <span>How TrendWave Ranks and Filters Trending YouTube Videos Today</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Not every high-view clip qualifies as genuinely viral or timely. YouTube's native Explore feeds are frequently flooded with hours-long live streams that report temporary viewer spikes rather than true viral momentum. TrendWave utilizes a multi-stage intelligent curation engine designed to filter out the noise and display only <strong>top trending youtube videos</strong>:</p>
+                            <ul class="seo-features-list" style="margin-top: 0.8rem;">
+                                <li><strong>48-Hour Freshness Window:</strong> Video velocity matters. We prioritize <strong>trending youtube videos</strong> uploaded within recent cycles, ensuring you see current viral sensations rather than recycled uploads from weeks or months ago.</li>
+                                <li><strong>1,000+ Verified View Floor:</strong> To protect your feed from low-quality spam, automated uploads, and arbitrary recommendations, every video on TrendWave must cross a verified view threshold before qualifying.</li>
+                                <li><strong>Authentic Live Stream Badging:</strong> Rather than cluttering the feed with broken duration counters, live broadcasts feature dedicated live indicators.</li>
+                                <li><strong>Ranked High to Low by Velocity:</strong> All qualified <strong>trending youtube videos right now</strong> are sorted in descending order based on verified views, putting the biggest cultural blockbusters directly at the top of your screen.</li>
+                            </ul>
+                        </div>
+                    </div>
 
-                <h3>Explore Both Regional and Global Trending YouTube Videos</h3>
-                <p>Cultural trends vary dramatically around the globe. What is dominating the conversation in New Delhi might be completely different from what is trending in Tokyo, London, or Los Angeles. TrendWave empowers you to effortlessly switch between major regions—including India, the United States, the United Kingdom, Canada, Australia, Japan, Germany, and Brazil—with a single click.</p>
-                <p>Need a panoramic international perspective? Toggle our dedicated Global Mode to experience true worldwide viral phenomena. Global mode intelligently filters out localized television soap operas and regional language scripts, aggregating universally recognized international hits such as Billboard chart-toppers, worldwide cinematic teasers, and monumental creator milestones with an elevated view threshold.</p>
+                    <div class="faq-item">
+                        <button class="faq-question" aria-expanded="false">
+                            <span>Explore Both Regional and Global Trending YouTube Videos</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Cultural trends vary dramatically around the globe. What is dominating the conversation in New Delhi might be completely different from what is trending in Tokyo, London, or Los Angeles. TrendWave empowers you to effortlessly switch between major regions—including India, the United States, the United Kingdom, Canada, Australia, Japan, Germany, and Brazil—with a single click.</p>
+                            <p>Need a panoramic international perspective? Toggle our dedicated Global Mode to experience true worldwide viral phenomena. Global mode intelligently filters out localized television soap operas and regional language scripts, aggregating universally recognized international hits such as Billboard chart-toppers, worldwide cinematic teasers, and monumental creator milestones with an elevated view threshold.</p>
+                        </div>
+                    </div>
 
-                <h3>Specialized Categories and Multi-Perspective Topic Exploration</h3>
-                <p>Whether your interest lies in Music, Gaming, News, Tech, or Entertainment, TrendWave features dedicated bottom category filters that help you zero in on specific genres instantly. Furthermore, TrendWave changes how you interact with trending content. Clicking any card initiates a targeted topic search across YouTube, allowing you to examine diverse perspectives, journalistic breakdowns, and community reaction videos rather than being confined to a single creator's upload. If you prefer to watch the original video immediately, our direct watch action is always one tap away.</p>
+                    <div class="faq-item">
+                        <button class="faq-question" aria-expanded="false">
+                            <span>Specialized Categories and Multi-Perspective Topic Exploration</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Whether your interest lies in Music, Gaming, News, Tech, or Entertainment, TrendWave features dedicated bottom category filters that help you zero in on specific genres instantly. Furthermore, TrendWave changes how you interact with trending content. Clicking any card initiates a targeted topic search across YouTube, allowing you to examine diverse perspectives, journalistic breakdowns, and community reaction videos rather than being confined to a single creator's upload. If you prefer to watch the original video immediately, our direct watch action is always one tap away.</p>
+                        </div>
+                    </div>
 
-                <h3>Committed to 100% User Privacy and Open Access</h3>
-                <p>Unlike mainstream entertainment portals, TrendWave requires no login, no Google account connection, and zero personal tracking cookies. Your region and theme preferences remain safely stored on your local device. Fast, reliable, and completely open, TrendWave represents the smartest way to browse <strong>trending youtube videos today</strong> and discover the <strong>top trending youtube videos right now</strong>.</p>
+                    <div class="faq-item">
+                        <button class="faq-question" aria-expanded="false">
+                            <span>Committed to 100% User Privacy and Open Access</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Unlike mainstream entertainment portals, TrendWave requires no login, no Google account connection, and zero personal tracking cookies. Your region and theme preferences remain safely stored on your local device. Fast, reliable, and completely open, TrendWave represents the smartest way to browse <strong>trending youtube videos today</strong> and discover the <strong>top trending youtube videos right now</strong>.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -275,8 +364,8 @@
                 <h4>Support & Feedback</h4>
                 <div class="footer-contact-info">
                     <p>Have a question or feedback? We'd love to hear from you.</p>
-                    <a href="mailto:contact.trendwave@gmail.com" class="footer-email-btn">
-                        <i class="fas fa-paper-plane"></i> contact.trendwave@gmail.com
+                    <a href="mailto:trendwaveyoutube@gmail.com" class="footer-email-btn">
+                        <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
                     </a>
                 </div>
             </div>

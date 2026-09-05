@@ -72,7 +72,7 @@
                     <div class="contact-info-text">
                         <h3>Direct Email</h3>
                         <p>For all inquiries, contact us directly at:</p>
-                        <p><a href="mailto:contact.trendwave@gmail.com">contact.trendwave@gmail.com</a></p>
+                        <p><a href="mailto:trendwaveyoutube@gmail.com">trendwaveyoutube@gmail.com</a></p>
                     </div>
                 </div>
 
@@ -181,8 +181,8 @@
                 <h4>Support & Feedback</h4>
                 <div class="footer-contact-info">
                     <p>Have a question or feedback? We'd love to hear from you.</p>
-                    <a href="mailto:contact.trendwave@gmail.com" class="footer-email-btn">
-                        <i class="fas fa-paper-plane"></i> contact.trendwave@gmail.com
+                    <a href="mailto:trendwaveyoutube@gmail.com" class="footer-email-btn">
+                        <i class="fas fa-paper-plane"></i> trendwaveyoutube@gmail.com
                     </a>
                 </div>
             </div>
@@ -235,13 +235,13 @@
             // Prepare email client mailto URL
             const subject = encodeURIComponent(`[TrendWave] ${category} - from ${name}`);
             const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nInquiry Type: ${category}\n\nMessage:\n${message}`);
-            const mailtoUrl = `mailto:contact.trendwave@gmail.com?subject=${subject}&body=${body}`;
+            const mailtoUrl = `mailto:trendwaveyoutube@gmail.com?subject=${subject}&body=${body}`;
 
             formFeedback.style.display = 'block';
             formFeedback.style.background = 'rgba(16, 185, 129, 0.15)';
             formFeedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
             formFeedback.style.color = '#10b981';
-            formFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Opening your email client to dispatch message. You can also email us directly at <strong>contact.trendwave@gmail.com</strong>.';
+            formFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Opening your email client to dispatch message. You can also email us directly at <strong>trendwaveyoutube@gmail.com</strong>.';
 
             setTimeout(() => {
                 window.location.href = mailtoUrl;

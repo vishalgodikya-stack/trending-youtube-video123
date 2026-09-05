@@ -462,11 +462,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Render Logic
-    const renderVideos = (videos) => {
-        const videoList = videos.slice(0, 30);
-        
-        videoList.forEach((video, index) => {
+    // Video Batching & Pagination State (Show max 6 videos initially, then load more)
+    const BATCH_SIZE = 6;
+    let currentFilteredVideos = [];
+    let displayedVideoCount = 0;
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+
+    // Mobile Drawer Navigation Elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const mobileDrawerOverlay = document.getElementById('mobile-drawer-overlay');
+    const topGuideToggleBtn = document.getElementById('top-guide-toggle-btn');
+
+    // Render Next Batch of Video Cards
+    const renderNextVideoBatch = () => {
+        const nextBatch = currentFilteredVideos.slice(displayedVideoCount, displayedVideoCount + BATCH_SIZE);
+        if (nextBatch.length === 0) {
+            if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
+            return;
+        }
+
+        nextBatch.forEach((video, batchIndex) => {
             const videoId = extractVideoId(video);
             const cleanTopic = cleanTopicQuery(video.title);
             const isLive = isLiveVideo(video);
@@ -534,29 +552,53 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
-            }, 50 + (index * 50));
+            }, 50 + (batchIndex * 50));
         });
 
+        displayedVideoCount += nextBatch.length;
         videoGrid.classList.remove('hidden');
+
+        // Show/hide load more button based on remaining videos
+        if (loadMoreContainer) {
+            if (displayedVideoCount < currentFilteredVideos.length) {
+                loadMoreContainer.classList.remove('hidden');
+            } else {
+                loadMoreContainer.classList.add('hidden');
+            }
+        }
+    };
+
+    // Render Logic
+    const renderVideos = (videos) => {
+        currentFilteredVideos = videos.slice(0, 36);
+        displayedVideoCount = 0;
+        videoGrid.innerHTML = '';
+        renderNextVideoBatch();
     };
 
     // UI State Toggles
-    const showLoader = () => loader.classList.remove('hidden');
+    const showLoader = () => {
+        loader.classList.remove('hidden');
+        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
+    };
     const hideLoader = () => loader.classList.add('hidden');
     const showError = () => {
         errorMessage.querySelector('p').innerHTML = 'Whoops! Failed to catch the latest wave.<br>Our sources might be down. Please try again later.';
         errorMessage.querySelector('i').className = 'fas fa-exclamation-circle';
         errorMessage.classList.remove('hidden');
+        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
     };
     const showCustomEmptyState = (customText) => {
         errorMessage.querySelector('p').innerHTML = customText;
         errorMessage.querySelector('i').className = 'fas fa-clock';
         errorMessage.classList.remove('hidden');
+        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
     };
     const hideError = () => errorMessage.classList.add('hidden');
     const clearGrid = () => {
         videoGrid.innerHTML = '';
         videoGrid.classList.add('hidden');
+        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
     };
 
     // Event Listeners
@@ -565,27 +607,89 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchTrendingVideos(region, currentCategory, isGlobal);
     });
 
-    // Homepage FAQ Accordion Functionality
-    const homeFaqQuestions = document.querySelectorAll('#home-faq-accordion .faq-question');
-    homeFaqQuestions.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const item = btn.closest('.faq-item');
-            const isOpen = item.classList.contains('open');
+    // Load More Trending Videos Handler
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            renderNextVideoBatch();
+        });
+    }
 
-            // Close other items for a clean accordion effect
-            document.querySelectorAll('#home-faq-accordion .faq-item').forEach(i => {
-                i.classList.remove('open');
-                const b = i.querySelector('.faq-question');
-                if (b) b.setAttribute('aria-expanded', 'false');
-            });
+    // Mobile Drawer Navigation Toggles
+    const openDrawer = () => {
+        if (mobileDrawer) {
+            mobileDrawer.classList.add('open');
+            mobileDrawer.setAttribute('aria-hidden', 'false');
+        }
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    };
 
-            // Toggle selected item
-            if (!isOpen) {
-                item.classList.add('open');
-                btn.setAttribute('aria-expanded', 'true');
+    const closeDrawer = () => {
+        if (mobileDrawer) {
+            mobileDrawer.classList.remove('open');
+            mobileDrawer.setAttribute('aria-hidden', 'true');
+        }
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openDrawer);
+    if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+    if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener('click', closeDrawer);
+    document.querySelectorAll('.drawer-link, .drawer-link-sub').forEach(link => {
+        link.addEventListener('click', closeDrawer);
+    });
+
+    // Top Quick Guide / Answers Scroll Handler
+    if (topGuideToggleBtn) {
+        topGuideToggleBtn.addEventListener('click', () => {
+            const guideSection = document.getElementById('seo-guide-section');
+            if (guideSection) {
+                guideSection.scrollIntoView({ behavior: 'smooth' });
+                // Expand the first SEO guide accordion item if none are open
+                const openItem = guideSection.querySelector('.faq-item.open');
+                if (!openItem) {
+                    const firstItem = guideSection.querySelector('.faq-item');
+                    if (firstItem) {
+                        firstItem.classList.add('open');
+                        const qBtn = firstItem.querySelector('.faq-question');
+                        if (qBtn) qBtn.setAttribute('aria-expanded', 'true');
+                    }
+                }
             }
         });
-    });
+    }
+
+    // Generic Accordion Initializer for Homepage SEO Guide and FAQ
+    const setupAccordion = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const questions = container.querySelectorAll('.faq-question');
+        questions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                if (!item) return;
+                const isOpen = item.classList.contains('open');
+
+                // Close other items in this accordion for clean single-expanded view
+                container.querySelectorAll('.faq-item').forEach(i => {
+                    i.classList.remove('open');
+                    const b = i.querySelector('.faq-question');
+                    if (b) b.setAttribute('aria-expanded', 'false');
+                });
+
+                // Toggle selected item
+                if (!isOpen) {
+                    item.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+    };
+
+    // Initialize both Homepage SEO Guide & FAQ Accordions
+    setupAccordion('home-faq-accordion');
+    setupAccordion('seo-guide-accordion');
 
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
