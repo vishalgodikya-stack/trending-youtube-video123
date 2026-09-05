@@ -245,6 +245,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return isWithin24h && !isOlder;
     };
 
+    // Filter to guarantee ONLY truly worldwide, international content in Global Mode
+    const REGIONAL_SCRIPTS_REGEX = /[\u0600-\u06FF\u0900-\u0DFF\u0E00-\u0E7F]/;
+    const REGIONAL_CHANNEL_BLOCKLIST = [
+        'sumantv', 'puthiyathalaimurai', 'polimer', 'thanthi', 'sun tv', 'etv',
+        'abp', 'aaj tak', 'zeenews', 'zee news', 'tv9', 'news18', 'ndtv', 'indiatv',
+        'vikatan', 'galatta', 'filmi', 'manorama', 'mathrubhumi', 'asianet', 'dangal'
+    ];
+
+    const isAuthenticGlobalVideo = (video) => {
+        const title = (video.title || '').trim();
+        const uploader = (video.uploaderName || '').toLowerCase();
+
+        // 1. Must NOT contain non-Latin regional language scripts (Tamil, Telugu, Hindi, Bengali, etc.)
+        if (REGIONAL_SCRIPTS_REGEX.test(title)) {
+            return false;
+        }
+
+        // 2. Must NOT be from local regional television or news networks
+        if (REGIONAL_CHANNEL_BLOCKLIST.some(ch => uploader.includes(ch))) {
+            return false;
+        }
+
+        // 3. For Global mode, require at least 50,000 views to ensure massive worldwide reach
+        const views = Number(video.views) || 0;
+        if (views < 50000) {
+            return false;
+        }
+
+        return true;
+    };
+
     // Fetch from a Piped API instance with timeout
     const fetchFromInstance = async (url) => {
         const controller = new AbortController();
@@ -303,16 +334,18 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (globalMode) {
-            // Worldwide Queries across YouTube
+            // Curated International Worldwide Queries targeting genuine global hits
             const globalQueries = category === 'all'
                 ? [
-                    'trending videos worldwide today',
-                    'viral videos today worldwide',
-                    'top trending youtube today global'
+                    'global viral video 2026',
+                    'trending international billboard hits',
+                    'official movie trailer 2026',
+                    'world trending youtube videos english',
+                    'top gaming reveals trailers 2026'
                   ]
                 : [
-                    `trending ${category} worldwide today`,
-                    `top ${category} videos worldwide today`
+                    `trending ${category} global english 2026`,
+                    `top ${category} official international hits`
                   ];
 
             for (const q of globalQueries) {
@@ -354,7 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Strict 24h present day + >= 5k views + non-live
         filtered = filtered.filter(isStrictlyTrendingToday);
 
-        // 3. Sort strictly from HIGH to LOW by view count
+        // 3. For Global Mode: Strictly enforce international authenticity (block regional scripts, TV stations, 50K+ min views)
+        if (globalMode) {
+            filtered = filtered.filter(isAuthenticGlobalVideo);
+        }
+
+        // 4. Sort strictly from HIGH to LOW by view count
         filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
 
         hideLoader();
