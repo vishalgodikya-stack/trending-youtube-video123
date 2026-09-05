@@ -21,5 +21,9 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/assets/icons/favicon.ico" },
+    { "source": "/site.webmanifest", "destination": "/assets/icons/site.webmanifest" }
   ]
 }

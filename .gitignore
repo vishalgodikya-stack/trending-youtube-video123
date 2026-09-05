@@ -1,4 +1,4 @@
-﻿# Operating System Files
+# Operating System Files
 .DS_Store
 .DS_Store?
 ._*
@@ -42,3 +42,10 @@ build/
 *.tmp
 temp/
 tmp/
+
+# Test Snapshots & Headless Browser Artifacts
+assets/screenshots/snap_*.png
+snap_*.png
+test_*.py
+edge-test-*
+
