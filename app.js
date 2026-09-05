@@ -35,16 +35,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Region Management
+    // Global Toggle & Region Management
+    const globalToggleBtn = document.getElementById('global-toggle-btn');
+    const regionPickerContainer = document.getElementById('region-picker-container');
     const savedRegion = localStorage.getItem('trendwave_region') || 'IN';
+    let isGlobal = localStorage.getItem('trendwave_is_global') === 'true';
     let currentCategory = 'all';
+
+    // Initialize Global Mode UI
+    if (isGlobal && globalToggleBtn && regionPickerContainer) {
+        globalToggleBtn.classList.add('active');
+        regionPickerContainer.classList.add('dimmed');
+    }
+
+    if (globalToggleBtn) {
+        globalToggleBtn.addEventListener('click', () => {
+            isGlobal = !isGlobal;
+            localStorage.setItem('trendwave_is_global', isGlobal);
+
+            if (isGlobal) {
+                globalToggleBtn.classList.add('active');
+                if (regionPickerContainer) regionPickerContainer.classList.add('dimmed');
+            } else {
+                globalToggleBtn.classList.remove('active');
+                if (regionPickerContainer) regionPickerContainer.classList.remove('dimmed');
+            }
+
+            const region = regionSelect ? regionSelect.value : 'IN';
+            fetchTrendingVideos(region, currentCategory, isGlobal);
+        });
+    }
 
     if (regionSelect) {
         regionSelect.value = savedRegion;
         regionSelect.addEventListener('change', (e) => {
             const newRegion = e.target.value;
             localStorage.setItem('trendwave_region', newRegion);
-            fetchTrendingVideos(newRegion, currentCategory);
+
+            // Selecting a country automatically turns Global mode off
+            if (isGlobal) {
+                isGlobal = false;
+                localStorage.setItem('trendwave_is_global', false);
+                if (globalToggleBtn) globalToggleBtn.classList.remove('active');
+                if (regionPickerContainer) regionPickerContainer.classList.remove('dimmed');
+            }
+
+            fetchTrendingVideos(newRegion, currentCategory, false);
         });
     }
 
@@ -57,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             currentCategory = e.target.dataset.category;
             const region = regionSelect ? regionSelect.value : 'IN';
-            fetchTrendingVideos(region, currentCategory);
+            fetchTrendingVideos(region, currentCategory, isGlobal);
         });
     });
 
@@ -243,7 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Main Fetch Logic — 24h present-day trending, >= 5k views, sorted high-to-low
-    const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN'), category = 'all') => {
+    const fetchTrendingVideos = async (
+        region = (localStorage.getItem('trendwave_region') || 'IN'),
+        category = 'all',
+        globalMode = (localStorage.getItem('trendwave_is_global') === 'true')
+    ) => {
         hideError();
         showLoader();
         clearGrid();
@@ -262,28 +302,49 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
-        // Source 1: Raw Trending endpoint for this region
-        const trendingItems = await fetchWithFallback(
-            (base) => `${base}/trending?region=${region}`
-        );
-        addCandidates(trendingItems);
+        if (globalMode) {
+            // Worldwide Queries across YouTube
+            const globalQueries = category === 'all'
+                ? [
+                    'trending videos worldwide today',
+                    'viral videos today worldwide',
+                    'top trending youtube today global'
+                  ]
+                : [
+                    `trending ${category} worldwide today`,
+                    `top ${category} videos worldwide today`
+                  ];
 
-        // Source 2: Fresh present-day trending search for this region
-        const regionSearchQuery = category === 'all' 
-            ? `trending today ${countryName}`
-            : `trending ${category} today ${countryName}`;
-
-        const searchItems = await fetchWithFallback(
-            (base) => `${base}/search?q=${encodeURIComponent(regionSearchQuery)}&filter=videos`
-        );
-        addCandidates(searchItems);
-
-        // If category is specific, also fetch a targeted category query
-        if (category !== 'all') {
-            const categorySearchItems = await fetchWithFallback(
-                (base) => `${base}/search?q=${encodeURIComponent(`top ${category} ${countryName} 2026`)}&filter=videos`
+            for (const q of globalQueries) {
+                const searchItems = await fetchWithFallback(
+                    (base) => `${base}/search?q=${encodeURIComponent(q)}&filter=videos`
+                );
+                addCandidates(searchItems);
+            }
+        } else {
+            // Source 1: Raw Trending endpoint for this region
+            const trendingItems = await fetchWithFallback(
+                (base) => `${base}/trending?region=${region}`
             );
-            addCandidates(categorySearchItems);
+            addCandidates(trendingItems);
+
+            // Source 2: Fresh present-day trending search for this region
+            const regionSearchQuery = category === 'all' 
+                ? `trending today ${countryName}`
+                : `trending ${category} today ${countryName}`;
+
+            const searchItems = await fetchWithFallback(
+                (base) => `${base}/search?q=${encodeURIComponent(regionSearchQuery)}&filter=videos`
+            );
+            addCandidates(searchItems);
+
+            // If category is specific, also fetch a targeted category query
+            if (category !== 'all') {
+                const categorySearchItems = await fetchWithFallback(
+                    (base) => `${base}/search?q=${encodeURIComponent(`top ${category} ${countryName} 2026`)}&filter=videos`
+                );
+                addCandidates(categorySearchItems);
+            }
         }
 
         // Apply filters:
@@ -301,8 +362,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filtered.length > 0) {
             renderVideos(filtered);
         } else {
-            console.warn('No videos strictly matched the 24h present-day and 5k+ view filter.');
-            showCustomEmptyState(`No videos with 5,000+ views uploaded in the last 24 hours found for ${countryName} (${category.toUpperCase()}). Try another region or category!`);
+            const scopeText = globalMode ? `Worldwide (${category.toUpperCase()})` : `${countryName} (${category.toUpperCase()})`;
+            console.warn(`No videos strictly matched the 24h present-day and 5k+ view filter for ${scopeText}.`);
+            showCustomEmptyState(`No videos with 5,000+ views uploaded in the last 24 hours found for ${scopeText}. Try another selection!`);
         }
     };
 
@@ -401,9 +463,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     retryBtn.addEventListener('click', () => {
         const region = regionSelect ? regionSelect.value : 'IN';
-        fetchTrendingVideos(region, currentCategory);
+        fetchTrendingVideos(region, currentCategory, isGlobal);
     });
 
     // Initial Bootstrap
-    fetchTrendingVideos(savedRegion, currentCategory);
+    fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
 });

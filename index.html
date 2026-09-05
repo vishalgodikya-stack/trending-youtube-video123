@@ -27,8 +27,11 @@
             <p>Today's hottest YouTube trends & topics</p>
         </div>
         <div class="header-controls">
-            <div class="region-picker" title="Change Trending Region">
-                <i class="fas fa-globe"></i>
+            <button id="global-toggle-btn" class="global-pill-btn" title="Toggle Worldwide Trending">
+                <i class="fas fa-globe-americas"></i> Global
+            </button>
+            <div class="region-picker" id="region-picker-container" title="Change Trending Region">
+                <i class="fas fa-map-marker-alt"></i>
                 <select id="region-select" aria-label="Select Region">
                     <option value="IN">🇮🇳 India</option>
                     <option value="US">🇺🇸 United States</option>
