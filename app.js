@@ -216,33 +216,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return keywords.some(keyword => searchText.includes(keyword));
     };
 
-    // Strict 24-hour present day filter & 5k minimum views & non-live
-    const isStrictlyTrendingToday = (video) => {
-        // 1. Exclude live streams (must have a valid positive duration)
-        if (!video.duration || video.duration <= 0) return false;
+    // Detect live streams and tournament broadcasts
+    const isLiveVideo = (video) => {
+        if (!video) return false;
+        if (!video.duration || video.duration <= 0 || video.duration === -1) return true;
+        if (video.isLive === true) return true;
+        const title = (video.title || '').toLowerCase();
+        return /(\b|#)live\b|🔴/.test(title);
+    };
 
-        // 2. Minimum 5,000 views
-        const views = Number(video.views) || 0;
-        if (views < 5000) return false;
+    // Check if video was uploaded within target hours (e.g. 48h) or is from official trending
+    const isFreshWithin = (video, maxHours = 48) => {
+        // Videos directly from official trending feed are current by definition
+        if (video.fromTrending) return true;
 
-        // 3. Must be uploaded strictly within the last 24 hours (present day)
+        // Check numerical millisecond timestamp
         if (video.uploaded && video.uploaded > 0) {
-            const diffMs = Date.now() - video.uploaded;
-            if (diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
-                return true;
-            }
-            // If uploaded timestamp is older than 24h, reject
-            if (diffMs > 24 * 60 * 60 * 1000) {
-                return false;
-            }
+            const diffHours = (Date.now() - video.uploaded) / (1000 * 60 * 60);
+            if (diffHours <= maxHours) return true;
+            if (diffHours > maxHours) return false;
         }
 
-        // Check relative time string (e.g., '3 hours ago', '45 minutes ago', 'today')
+        // Check relative time string (e.g., '3 hours ago', 'today', 'yesterday', '1 day ago', '2 days ago')
         const dateStr = (video.uploadedDate || '').toLowerCase();
-        const isWithin24h = /minute|hour|today|moments/i.test(dateStr);
-        const isOlder = /day|week|month|year/i.test(dateStr);
+        if (/\b(second|minute|hour|today|yesterday|1 day|2 days)\b/i.test(dateStr)) {
+            return true;
+        }
+        if (/\b([3-9] days|\d+ days|week|month|year)\b/i.test(dateStr)) {
+            return false;
+        }
 
-        return isWithin24h && !isOlder;
+        // Default to true for unannotated live or recent streams
+        return true;
     };
 
     // Filter to guarantee ONLY truly worldwide, international content in Global Mode
@@ -264,12 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Must NOT be from local regional television or news networks
         if (REGIONAL_CHANNEL_BLOCKLIST.some(ch => uploader.includes(ch))) {
-            return false;
-        }
-
-        // 3. For Global mode, require at least 50,000 views to ensure massive worldwide reach
-        const views = Number(video.views) || 0;
-        if (views < 50000) {
             return false;
         }
 
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return [];
     };
 
-    // Main Fetch Logic — 24h present-day trending, >= 5k views, sorted high-to-low
+    // Main Fetch Logic — Smart tiered threshold & automatic fallback
     const fetchTrendingVideos = async (
         region = (localStorage.getItem('trendwave_region') || 'IN'),
         category = 'all',
@@ -323,11 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const candidatePool = [];
         const seenUrls = new Set();
 
-        const addCandidates = (items) => {
+        const addCandidates = (items, fromTrending = false) => {
             if (!Array.isArray(items)) return;
             items.forEach(item => {
                 if (item && item.url && !seenUrls.has(item.url)) {
                     seenUrls.add(item.url);
+                    item.fromTrending = fromTrending;
                     candidatePool.push(item);
                 }
             });
@@ -352,14 +352,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 const searchItems = await fetchWithFallback(
                     (base) => `${base}/search?q=${encodeURIComponent(q)}&filter=videos`
                 );
-                addCandidates(searchItems);
+                addCandidates(searchItems, false);
             }
+
+            // Also fetch worldwide general trending feed as foundation
+            const worldTrending = await fetchWithFallback(
+                (base) => `${base}/trending?region=US`
+            );
+            addCandidates(worldTrending, true);
+
+            // Filter by category
+            let candidates = candidatePool.filter(v => matchesCategory(v, category));
+
+            // Filter out non-Latin scripts and local regional television channels
+            candidates = candidates.filter(isAuthenticGlobalVideo);
+
+            // Global Tier 1: Target 25,000+ views for international blockbuster hits
+            let filtered = candidates.filter(v => (Number(v.views) || 0) >= 25000);
+
+            // Global Tier 2 Fallback: Relax to 10,000+ views if fewer than 12 videos qualify
+            if (filtered.length < 12) {
+                filtered = candidates.filter(v => (Number(v.views) || 0) >= 10000);
+            }
+
+            // Global Tier 3 Safety: Relax to 5,000+ views if fewer than 8 videos qualify
+            if (filtered.length < 8) {
+                filtered = candidates.filter(v => (Number(v.views) || 0) >= 5000);
+            }
+
+            if (filtered.length === 0 && candidates.length > 0) {
+                filtered = candidates;
+            }
+
+            // Sort strictly from HIGH to LOW by view count
+            filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
+
+            hideLoader();
+
+            if (filtered.length > 0) {
+                renderVideos(filtered);
+            } else {
+                showCustomEmptyState(`Unable to load worldwide trends right now. Click below to retry!`);
+            }
+
         } else {
-            // Source 1: Raw Trending endpoint for this region
+            // Source 1: Raw Trending endpoint for this region (official verified trending)
             const trendingItems = await fetchWithFallback(
                 (base) => `${base}/trending?region=${region}`
             );
-            addCandidates(trendingItems);
+            addCandidates(trendingItems, true);
 
             // Source 2: Fresh present-day trending search for this region
             const regionSearchQuery = category === 'all' 
@@ -369,40 +410,55 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchItems = await fetchWithFallback(
                 (base) => `${base}/search?q=${encodeURIComponent(regionSearchQuery)}&filter=videos`
             );
-            addCandidates(searchItems);
+            addCandidates(searchItems, false);
 
             // If category is specific, also fetch a targeted category query
             if (category !== 'all') {
                 const categorySearchItems = await fetchWithFallback(
                     (base) => `${base}/search?q=${encodeURIComponent(`top ${category} ${countryName} 2026`)}&filter=videos`
                 );
-                addCandidates(categorySearchItems);
+                addCandidates(categorySearchItems, false);
             }
-        }
 
-        // Apply filters:
-        // 1. Category filter
-        let filtered = candidatePool.filter(v => matchesCategory(v, category));
+            // 1. Category filter
+            let candidates = candidatePool.filter(v => matchesCategory(v, category));
 
-        // 2. Strict 24h present day + >= 5k views + non-live
-        filtered = filtered.filter(isStrictlyTrendingToday);
+            // 2. Tier 1: Target >= 1,000 views and fresh within 48 hours
+            let filtered = candidates.filter(v => {
+                const views = Number(v.views) || 0;
+                return views >= 1000 && isFreshWithin(v, 48);
+            });
 
-        // 3. For Global Mode: Strictly enforce international authenticity (block regional scripts, TV stations, 50K+ min views)
-        if (globalMode) {
-            filtered = filtered.filter(isAuthenticGlobalVideo);
-        }
+            // 3. Tier 2 Smart Fallback: If fewer than 8 videos qualify, automatically relax to all official trending videos
+            if (filtered.length < 8) {
+                console.log(`Tier 1 yielded only ${filtered.length} videos. Activating smart fallback for ${countryName}.`);
+                const existingUrls = new Set(filtered.map(v => v.url));
+                candidates.forEach(v => {
+                    if (!existingUrls.has(v.url)) {
+                        if (v.fromTrending || (Number(v.views) || 0) >= 500) {
+                            existingUrls.add(v.url);
+                            filtered.push(v);
+                        }
+                    }
+                });
+            }
 
-        // 4. Sort strictly from HIGH to LOW by view count
-        filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
+            // 4. Ultimate safety fallback: If still empty, display all category candidates
+            if (filtered.length === 0 && candidates.length > 0) {
+                filtered = candidates;
+            }
 
-        hideLoader();
+            // Sort strictly from HIGH to LOW by view count
+            filtered.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
 
-        if (filtered.length > 0) {
-            renderVideos(filtered);
-        } else {
-            const scopeText = globalMode ? `Worldwide (${category.toUpperCase()})` : `${countryName} (${category.toUpperCase()})`;
-            console.warn(`No videos strictly matched the 24h present-day and 5k+ view filter for ${scopeText}.`);
-            showCustomEmptyState(`No videos with 5,000+ views uploaded in the last 24 hours found for ${scopeText}. Try another selection!`);
+            hideLoader();
+
+            if (filtered.length > 0) {
+                renderVideos(filtered);
+            } else {
+                const scopeText = `${countryName} (${category.toUpperCase()})`;
+                showCustomEmptyState(`No videos currently available for ${scopeText}. Click below to retry!`);
+            }
         }
     };
 
@@ -413,6 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
         videoList.forEach((video, index) => {
             const videoId = extractVideoId(video);
             const cleanTopic = cleanTopicQuery(video.title);
+            const isLive = isLiveVideo(video);
             
             // Topic exploration search link (opens exact matching topic results)
             const topicSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanTopic)}`;
@@ -422,6 +479,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const tNavUrl = video.thumbnail || 'https://via.placeholder.com/640x360.png?text=No+Thumbnail';
             const avatarUrl = video.uploaderAvatar;
+            
+            const durationHtml = isLive 
+                ? `<div class="video-duration live-badge"><i class="fas fa-circle"></i> LIVE</div>`
+                : `<div class="video-duration">${formatDuration(video.duration)}</div>`;
             
             const card = document.createElement('article');
             card.className = 'video-card';
@@ -442,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="play-overlay" title="Watch direct video" onclick="event.stopPropagation();">
                         <i class="fas fa-play-circle"></i>
                     </a>
-                    <div class="video-duration">${formatDuration(video.duration)}</div>
+                    ${durationHtml}
                 </div>
                 <div class="card-content">
                     <span class="topic-tag"><i class="fas fa-fire"></i> Trending Topic</span>
