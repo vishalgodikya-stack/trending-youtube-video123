@@ -133,66 +133,115 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Verified public Piped instances with CORS enabled
-    const getApiUrls = (region, category) => {
-        if (category === 'all') {
-            return [
-                `https://api.piped.private.coffee/trending?region=${region}`,
-                `https://pipedapi.ducks.party/trending?region=${region}`,
-                `https://pipedapi.kavin.rocks/trending?region=${region}`
-            ];
-        } else {
-            const query = `trending ${category}`;
-            return [
-                `https://api.piped.private.coffee/search?q=${encodeURIComponent(query)}&filter=videos`,
-                `https://pipedapi.ducks.party/search?q=${encodeURIComponent(query)}&filter=videos`,
-                `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`
-            ];
+    const API_INSTANCES = [
+        'https://api.piped.private.coffee',
+        'https://pipedapi.ducks.party',
+        'https://pipedapi.kavin.rocks'
+    ];
+
+    // Category keyword maps for client-side filtering
+    const CATEGORY_KEYWORDS = {
+        music: ['music', 'song', 'album', 'singer', 'rap', 'hip hop', 'remix', 'lyric', 'melody',
+                'concert', 'beat', 'dj', 'rhythm', 'band', 'track', 'acoustic', 'vocal', 'playlist',
+                'mv', 'official video', 'music video', 'ft.', 'feat.', 'audio', 'studio', 'cover'],
+        gaming: ['game', 'gaming', 'gameplay', 'playthrough', 'walkthrough', 'gamer', 'stream',
+                 'fortnite', 'minecraft', 'roblox', 'gta', 'valorant', 'cod', 'warzone', 'apex',
+                 'esports', 'speedrun', 'lets play', 'ps5', 'xbox', 'nintendo', 'blox fruits',
+                 'ffmic', 'free fire', 'pubg', 'bgmi'],
+        news: ['news', 'breaking', 'report', 'live', 'politics', 'election', 'debate', 'press',
+               'update', 'crisis', 'protest', 'interview', 'analysis', 'aaj tak', 'ndtv',
+               'times now', 'republic', 'cnn', 'fox', 'bbc', 'abc news', 'headlines', 'bulletin'],
+        tech: ['tech', 'technology', 'review', 'unboxing', 'gadget', 'phone', 'laptop', 'iphone',
+               'samsung', 'google', 'apple', 'android', 'ios', 'ai', 'software', 'hardware',
+               'cpu', 'gpu', 'nvidia', 'amd', 'programming', 'coding', 'developer', 'app'],
+        entertainment: ['entertainment', 'movie', 'film', 'trailer', 'celebrity', 'drama', 'comedy',
+                        'show', 'series', 'episode', 'season', 'reality', 'award', 'red carpet',
+                        'bollywood', 'hollywood', 'teaser', 'vlog', 'prank', 'challenge', 'react',
+                        'funny', 'sketch', 'standup', 'stand-up', 'talent', 'dance']
+    };
+
+    // Check if a video matches a category based on title and channel name
+    const matchesCategory = (video, category) => {
+        if (category === 'all') return true;
+        const keywords = CATEGORY_KEYWORDS[category] || [];
+        const searchText = `${video.title || ''} ${video.uploaderName || ''}`.toLowerCase();
+        return keywords.some(keyword => searchText.includes(keyword));
+    };
+
+    // Fetch from a Piped API instance with timeout
+    const fetchFromInstance = async (url) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        try {
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            clearTimeout(timeoutId);
+            throw error;
         }
     };
 
-    // Fetch Logic
+    // Try fetching from multiple instances with fallback
+    const fetchWithFallback = async (buildUrl) => {
+        for (const base of API_INSTANCES) {
+            try {
+                const url = buildUrl(base);
+                const data = await fetchFromInstance(url);
+                const items = Array.isArray(data) ? data : (data.items || []);
+                if (items.length > 0) return items;
+            } catch (error) {
+                console.warn(`Failed: ${base}`, error.message);
+            }
+        }
+        return null;
+    };
+
+    // Main Fetch Logic — always region-accurate, with category filtering + supplement
     const fetchTrendingVideos = async (region = (localStorage.getItem('trendwave_region') || 'IN'), category = 'all') => {
         hideError();
         showLoader();
         clearGrid();
 
-        const apiUrls = getApiUrls(region, category);
-        let data = null;
-        let fetchSuccess = false;
+        // Step 1: Always fetch the trending feed for the selected region
+        const trendingData = await fetchWithFallback(
+            (base) => `${base}/trending?region=${region}`
+        );
 
-        for (const url of apiUrls) {
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000);
-                
-                const response = await fetch(url, { 
-                    headers: { 'Accept': 'application/json' },
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-                
-                data = await response.json();
-                
-                let itemsArray = Array.isArray(data) ? data : (data.items || []);
-                
-                if (itemsArray.length > 0) {
-                    data = itemsArray;
-                    fetchSuccess = true;
-                    break;
-                }
-            } catch (error) {
-                console.warn(`Failed fetching from ${url}:`, error.message);
+        if (!trendingData) {
+            hideLoader();
+            console.error('All API instances failed to return data.');
+            showError();
+            return;
+        }
+
+        // Step 2: Filter by category client-side
+        let filtered = trendingData.filter(v => matchesCategory(v, category));
+
+        // Step 3: If fewer than 3 matches, supplement with search results
+        if (category !== 'all' && filtered.length < 3) {
+            const searchQuery = `trending ${category}`;
+            const searchData = await fetchWithFallback(
+                (base) => `${base}/search?q=${encodeURIComponent(searchQuery)}&filter=videos`
+            );
+            if (searchData) {
+                // Deduplicate by video URL
+                const existingUrls = new Set(filtered.map(v => v.url));
+                const supplements = searchData.filter(v => !existingUrls.has(v.url));
+                filtered = [...filtered, ...supplements];
             }
         }
 
         hideLoader();
 
-        if (fetchSuccess && data) {
-            renderVideos(data);
+        if (filtered.length > 0) {
+            renderVideos(filtered);
         } else {
-            console.error('All API instances failed to return data.');
+            console.error('No videos matched the selected category.');
             showError();
         }
     };
