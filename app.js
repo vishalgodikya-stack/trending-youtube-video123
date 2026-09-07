@@ -942,15 +942,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const x = (e.clientX - rect.left) / rect.width;
             const y = (e.clientY - rect.top) / rect.height;
 
-            const tiltX = (y - 0.5) * -12;
-            const tiltY = (x - 0.5) * 12;
+            const tiltX = (y - 0.5) * -4;
+            const tiltY = (x - 0.5) * 4;
 
-            card.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+            card.style.transform = `perspective(2000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
 
             const glare = card.querySelector('.card-glare');
             if (glare) {
-                glare.style.opacity = '1';
-                glare.style.background = `radial-gradient(circle 280px at ${x * 100}% ${y * 100}%, rgba(255, 255, 255, 0.16), rgba(255, 0, 51, 0.1) 40%, transparent 80%)`;
+                glare.style.opacity = '0.7';
+                glare.style.background = `radial-gradient(circle 320px at ${x * 100}% ${y * 100}%, rgba(255, 255, 255, 0.12), rgba(255, 0, 51, 0.06) 45%, transparent 80%)`;
             }
         }, { passive: true });
 
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = e.target.closest('.video-card');
             if (!card) return;
             if (!card.contains(e.relatedTarget)) {
-                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                card.style.transform = 'perspective(2000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
                 const glare = card.querySelector('.card-glare');
                 if (glare) glare.style.opacity = '0';
             }

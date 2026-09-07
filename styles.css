@@ -512,7 +512,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2.5rem;
-    perspective: 1200px;
+    perspective: 2000px;
 }
 
 /* Video Card Content */
@@ -532,8 +532,8 @@ body {
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
-    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform: perspective(2000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
                 box-shadow 0.35s ease,
                 border-color 0.35s ease,
                 opacity 0.35s ease-out;
