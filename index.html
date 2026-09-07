@@ -99,14 +99,13 @@
 </head>
 <body>
     <div class="background-elements">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+        <div class="cursor-glow" id="cursor-glow"></div>
+        <div class="ambient-glow ambient-top-center"></div>
     </div>
 
     <header class="glass-header">
         <div class="header-content">
-            <h1><i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span></h1>
+            <h1><i class="fab fa-youtube" style="color: #ff0033;"></i> Trend<span class="highlight">Wave</span></h1>
             <p>Today's hottest YouTube trends & topics</p>
         </div>
         <div class="header-controls">
@@ -152,14 +151,14 @@
     <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
         <div class="mobile-drawer-header">
             <div class="drawer-logo">
-                <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+                <i class="fab fa-youtube" style="color: #ff0033;"></i> Trend<span class="highlight">Wave</span>
             </div>
             <button id="close-drawer-btn" class="close-drawer-btn" aria-label="Close Navigation Menu">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <nav class="mobile-drawer-nav">
-            <a href="index.html" class="drawer-link active"><i class="fas fa-fire" style="color: #ff0055;"></i> Trending Feed</a>
+            <a href="index.html" class="drawer-link active"><i class="fas fa-fire" style="color: #ff0033;"></i> Trending Feed</a>
             <a href="faq.html" class="drawer-link"><i class="fas fa-question-circle"></i> Quick Answers & FAQ</a>
             <a href="about.html" class="drawer-link"><i class="fas fa-info-circle"></i> About Us</a>
             <a href="contact.html" class="drawer-link"><i class="fas fa-envelope"></i> Contact Us</a>
@@ -178,7 +177,7 @@
         <!-- Compact Quick Guide / Answers Bar at the Top -->
         <div class="top-guide-bar">
             <button id="top-guide-toggle-btn" class="top-guide-btn" title="View Quick Answers & Trend Guide">
-                <span><i class="fas fa-bolt" style="color: #ff0055;"></i> Quick Answers & Trend Guide</span>
+                <span><i class="fas fa-bolt" style="color: #ff0033;"></i> Quick Answers & Trend Guide</span>
                 <i class="fas fa-chevron-down toggle-chevron"></i>
             </button>
         </div>
@@ -334,7 +333,7 @@
         <div class="footer-container">
             <div class="footer-brand">
                 <a href="index.html" class="footer-logo">
-                    <i class="fab fa-youtube" style="color: #ff0055;"></i> Trend<span class="highlight">Wave</span>
+                    <i class="fab fa-youtube" style="color: #ff0033;"></i> Trend<span class="highlight">Wave</span>
                 </a>
                 <p>Real-time trending YouTube videos today without personal algorithmic bias. Explore viral phenomena across global charts instantly.</p>
                 <span class="footer-badge-pill"><i class="fas fa-circle"></i> Live Global Stream</span>
@@ -382,6 +381,7 @@
     </footer>
 
     <nav class="category-tabs" id="category-tabs">
+        <div class="category-pill-indicator" id="category-pill-indicator"></div>
         <button class="category-tab active" data-category="all">Trending</button>
         <button class="category-tab" data-category="music">Music</button>
         <button class="category-tab" data-category="gaming">Gaming</button>

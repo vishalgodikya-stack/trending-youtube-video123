@@ -14,26 +14,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scroll-based hide/show for bottom category bar
     const categoryBar = document.getElementById('category-tabs');
+    const categoryPill = document.getElementById('category-pill-indicator');
     let lastScrollY = window.scrollY;
     let scrollTicking = false;
+
+    // Helper to position the dynamic sliding red pill indicator
+    const updatePillPosition = (activeBtn) => {
+        if (!categoryPill || !activeBtn) return;
+        const offsetLeft = activeBtn.offsetLeft;
+        const width = activeBtn.offsetWidth;
+        categoryPill.style.transform = `translateX(${offsetLeft}px)`;
+        categoryPill.style.width = `${width}px`;
+    };
+
+    // Position pill on start and window resize
+    const initialActiveTab = document.querySelector('.category-tab.active');
+    if (initialActiveTab) {
+        setTimeout(() => updatePillPosition(initialActiveTab), 80);
+    }
+    window.addEventListener('resize', () => {
+        const currentActiveTab = document.querySelector('.category-tab.active');
+        if (currentActiveTab) updatePillPosition(currentActiveTab);
+    }, { passive: true });
 
     window.addEventListener('scroll', () => {
         if (!scrollTicking) {
             window.requestAnimationFrame(() => {
                 const currentScrollY = window.scrollY;
-                if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    // Scrolling down — hide the bar
-                    categoryBar.classList.add('tabs-hidden');
-                } else {
-                    // Scrolling up — show the bar
-                    categoryBar.classList.remove('tabs-hidden');
+                if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                    // Scrolling down — smoothly hide the bar
+                    if (categoryBar) categoryBar.classList.add('tabs-hidden');
+                } else if (currentScrollY < lastScrollY) {
+                    // Scrolling up — smoothly restore the bar
+                    if (categoryBar) categoryBar.classList.remove('tabs-hidden');
                 }
                 lastScrollY = currentScrollY;
                 scrollTicking = false;
             });
             scrollTicking = true;
         }
-    });
+    }, { passive: true });
 
     // Global Toggle & Region Management
     const globalToggleBtn = document.getElementById('global-toggle-btn');
@@ -89,9 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     categoryTabs.forEach(tab => {
         tab.addEventListener('click', (e) => {
             categoryTabs.forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
+            e.currentTarget.classList.add('active');
+            updatePillPosition(e.currentTarget);
             
-            currentCategory = e.target.dataset.category;
+            currentCategory = e.currentTarget.dataset.category;
             const region = regionSelect ? regionSelect.value : 'IN';
             fetchTrendingVideos(region, currentCategory, isGlobal);
         });
@@ -701,6 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = 'translateY(30px)';
             
             card.innerHTML = `
+                <div class="card-glare"></div>
                 <div class="thumbnail-container">
                     <img src="${tNavUrl}" alt="${video.title}" class="video-thumbnail" loading="lazy">
                     <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="play-overlay" title="Watch direct video" onclick="event.stopPropagation();">
@@ -733,10 +755,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             videoGrid.appendChild(card);
             
-            // Trigger animation sequentially
+            // Trigger animation sequentially, then clear inline transform so 3D tilt can control it
             setTimeout(() => {
                 card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
+                card.style.transform = '';
             }, 50 + (batchIndex * 50));
         });
 
@@ -883,6 +905,65 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize both Homepage SEO Guide & FAQ Accordions
     setupAccordion('home-faq-accordion');
     setupAccordion('seo-guide-accordion');
+
+    // High-Tech Interactive Cursor Red Glow (Desktop pointer)
+    const cursorGlow = document.getElementById('cursor-glow');
+    if (cursorGlow && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        let mouseX = -9999, mouseY = -9999;
+        let currentX = -9999, currentY = -9999;
+        let isGlowVisible = false;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isGlowVisible) {
+                isGlowVisible = true;
+                cursorGlow.classList.add('active');
+            }
+        }, { passive: true });
+
+        const animateGlow = () => {
+            if (isGlowVisible) {
+                currentX += (mouseX - currentX) * 0.12;
+                currentY += (mouseY - currentY) * 0.12;
+                cursorGlow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+            }
+            requestAnimationFrame(animateGlow);
+        };
+        requestAnimationFrame(animateGlow);
+    }
+
+    // 3D Card Tilt & Specular Glare Physics (Desktop pointer)
+    if (videoGrid && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        videoGrid.addEventListener('mousemove', (e) => {
+            const card = e.target.closest('.video-card');
+            if (!card) return;
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+
+            const tiltX = (y - 0.5) * -12;
+            const tiltY = (x - 0.5) * 12;
+
+            card.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+
+            const glare = card.querySelector('.card-glare');
+            if (glare) {
+                glare.style.opacity = '1';
+                glare.style.background = `radial-gradient(circle 280px at ${x * 100}% ${y * 100}%, rgba(255, 255, 255, 0.16), rgba(255, 0, 51, 0.1) 40%, transparent 80%)`;
+            }
+        }, { passive: true });
+
+        videoGrid.addEventListener('mouseout', (e) => {
+            const card = e.target.closest('.video-card');
+            if (!card) return;
+            if (!card.contains(e.relatedTarget)) {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                const glare = card.querySelector('.card-glare');
+                if (glare) glare.style.opacity = '0';
+            }
+        });
+    }
 
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
