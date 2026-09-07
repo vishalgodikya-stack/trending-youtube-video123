@@ -748,6 +748,195 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ==========================================================================
+   Animation System: Page Load, Scroll Reveal, Glow, Accent Breathing
+   Subtle & Professional (150–400ms, Apple/Stripe-style polish)
+   ========================================================================== */
+
+/* --- Page Load Entrance Animations --- */
+@keyframes headerSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideRight {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes subtleScaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Accent Breathing Glow --- */
+@keyframes accentBreath {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 85, 0.2); }
+    50% { box-shadow: 0 0 16px rgba(255, 0, 85, 0.45); }
+}
+
+@keyframes accentTextBreath {
+    0%, 100% { text-shadow: 0 0 6px rgba(255, 0, 85, 0.15); }
+    50% { text-shadow: 0 0 12px rgba(255, 0, 85, 0.35); }
+}
+
+/* --- Button Hover Glow Pulse --- */
+@keyframes btnGlowPulse {
+    0%, 100% { box-shadow: 0 0 12px var(--accent-glow); }
+    50% { box-shadow: 0 0 22px var(--accent-glow), 0 0 6px var(--accent-glow); }
+}
+
+/* Page Load: Header slides down */
+.glass-header {
+    animation: headerSlideDown 0.4s ease-out both;
+}
+
+/* Page Load: Reader nav slides down */
+.reader-nav {
+    animation: headerSlideDown 0.35s ease-out both;
+}
+
+/* Page Load: Category tabs fade-slide up */
+.category-tabs {
+    animation: fadeSlideUp 0.4s ease-out 0.1s both;
+}
+
+/* Page Load: Container content fades in */
+.container {
+    animation: subtleScaleIn 0.35s ease-out 0.15s both;
+}
+
+/* Page Load: Reader hero and content */
+.reader-hero {
+    animation: fadeSlideUp 0.4s ease-out 0.1s both;
+}
+
+.reader-card {
+    animation: fadeSlideUp 0.35s ease-out 0.2s both;
+}
+
+/* --- Scroll Reveal System (CSS-driven, JS applies .revealed) --- */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger delays for sequential reveal */
+.scroll-reveal[data-delay="1"] { transition-delay: 0.06s; }
+.scroll-reveal[data-delay="2"] { transition-delay: 0.12s; }
+.scroll-reveal[data-delay="3"] { transition-delay: 0.18s; }
+.scroll-reveal[data-delay="4"] { transition-delay: 0.24s; }
+
+/* --- Enhanced Video Card Stagger Entry --- */
+.video-card {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.4s ease,
+                border-color 0.4s ease,
+                opacity 0.35s ease-out;
+}
+
+/* --- Button Hover Enhancements --- */
+.load-more-button:hover {
+    animation: btnGlowPulse 1.2s ease-in-out infinite;
+}
+
+.category-tab:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.category-tab.active {
+    animation: accentBreath 3s ease-in-out infinite;
+}
+
+.global-pill-btn:hover,
+.icon-pill-btn:hover {
+    transform: translateY(-1px);
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.glass-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    animation: btnGlowPulse 1.2s ease-in-out infinite;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    animation: btnGlowPulse 1.2s ease-in-out infinite;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* --- Accent Glow Breathing on Badges --- */
+.topic-tag {
+    animation: accentBreath 4s ease-in-out infinite;
+}
+
+.video-duration.live-badge {
+    animation: accentBreath 2s ease-in-out infinite;
+}
+
+.highlight {
+    animation: accentTextBreath 4s ease-in-out infinite;
+}
+
+.footer-badge-pill {
+    animation: accentBreath 3.5s ease-in-out infinite;
+}
+
+/* --- Smooth Theme Toggle Enhancement --- */
+.glass-header,
+.category-tabs,
+.video-card,
+.seo-card,
+.site-footer,
+.reader-nav,
+.reader-card,
+.contact-form-card,
+.contact-info-item,
+.faq-item,
+.error-card {
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease,
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- Footer Section Scroll Reveal --- */
+.site-footer {
+    animation: fadeSlideUp 0.4s ease-out 0.2s both;
+}
+
+/* --- SEO Card Scroll Reveal --- */
+.seo-section {
+    animation: subtleScaleIn 0.35s ease-out 0.25s both;
+}
+
+/* --- Respect prefers-reduced-motion --- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .scroll-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
 /* SEO Content Section */
 .seo-section {
     margin-top: 4.5rem;
