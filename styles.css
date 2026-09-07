@@ -102,9 +102,9 @@ body {
 
 /* Glassmorphism Components */
 .glass-header {
-    background: var(--card-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(8, 9, 13, 0.75);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border-bottom: 1px solid var(--card-border);
     padding: 1.1rem clamp(1.2rem, 2.5vw, 2.8rem);
     display: flex;
@@ -113,10 +113,15 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.light-mode .glass-header {
+    background: rgba(247, 248, 250, 0.8);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 .header-content {
@@ -328,12 +333,12 @@ body {
     align-items: center;
     gap: 4px;
     padding: 6px;
-    background: rgba(12, 14, 18, 0.85);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 12, 16, 0.65);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 50px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     z-index: 200;
     max-width: min(96vw, 680px);
     overflow-x: auto;
@@ -349,9 +354,11 @@ body {
 }
 
 .light-mode .category-tabs {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .category-tabs.tabs-hidden {
@@ -616,9 +623,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(8, 9, 13, 0.45);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1460,12 +1465,16 @@ body {
     justify-content: space-between;
     padding: 1.2rem 3rem;
     border-bottom: 1px solid var(--card-border);
-    background: var(--card-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(8, 9, 13, 0.75);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+.light-mode .reader-nav {
+    background: rgba(247, 248, 250, 0.8);
 }
 
 .reader-nav-controls {
@@ -1800,14 +1809,18 @@ body {
    Modern Glassmorphic Site Footer
    ========================================================================== */
 .site-footer {
-    background: var(--card-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(8, 9, 13, 0.72);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border-top: 1px solid var(--card-border);
     padding: 4.5rem 2.5rem 7.5rem;
     margin-top: auto;
     position: relative;
     z-index: 10;
+}
+
+.light-mode .site-footer {
+    background: rgba(247, 248, 250, 0.75);
 }
 
 .footer-container {
