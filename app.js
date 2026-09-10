@@ -914,7 +914,112 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAccordion('home-faq-accordion');
     setupAccordion('seo-guide-accordion');
 
-    // NOTE: Cursor glow and 3D card tilt are now handled by scripts/glass-animations.js (GSAP-powered)
+    // =========================================================================
+    //  Dynamic Video Thumbnail Background on Card Hover
+    //  - When hovering any video card, use that video's thumbnail as page background
+    //  - Background image itself remains completely SHARP and CLEAR
+    //  - Zero blur, fog, haze, milky overlay, or filter on dynamic background
+    //  - Smooth crossfade between cards
+    //  - Smooth restore to normal background when cursor leaves video cards
+    // =========================================================================
+    const initDynamicThumbnailBackground = () => {
+        const container = document.getElementById('dynamic-thumbnail-bg');
+        const layerA = document.getElementById('dynamic-bg-layer-a');
+        const layerB = document.getElementById('dynamic-bg-layer-b');
+        if (!container || !layerA || !layerB) return;
+
+        let activeLayer = null;
+        let currentUrl = '';
+        let hideTimer = null;
+
+        const showThumbnail = (url) => {
+            if (!url) return;
+            if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimer = null;
+            }
+
+            if (currentUrl === url && container.classList.contains('active')) {
+                return;
+            }
+
+            currentUrl = url;
+
+            if (!activeLayer || activeLayer === 'b') {
+                layerA.style.backgroundImage = `url("${url}")`;
+                layerA.style.zIndex = '2';
+                layerB.style.zIndex = '1';
+                layerA.classList.add('visible');
+                layerB.classList.remove('visible');
+                activeLayer = 'a';
+            } else {
+                layerB.style.backgroundImage = `url("${url}")`;
+                layerB.style.zIndex = '2';
+                layerA.style.zIndex = '1';
+                layerB.classList.add('visible');
+                layerA.classList.remove('visible');
+                activeLayer = 'b';
+            }
+
+            container.classList.add('active');
+        };
+
+        const hideThumbnail = () => {
+            if (hideTimer) clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+                container.classList.remove('active');
+                setTimeout(() => {
+                    if (!container.classList.contains('active')) {
+                        if (layerA) layerA.classList.remove('visible');
+                        if (layerB) layerB.classList.remove('visible');
+                        currentUrl = '';
+                        activeLayer = null;
+                    }
+                }, 400);
+            }, 80);
+        };
+
+        // Delegated mouseover: catch any video card enter
+        document.addEventListener('mouseover', (e) => {
+            const card = e.target.closest('.video-card');
+            if (!card) return;
+
+            const thumbImg = card.querySelector('.video-thumbnail');
+            const url = card.dataset.thumbnail || (thumbImg ? thumbImg.src : null);
+            if (url) {
+                showThumbnail(url);
+            }
+        }, { passive: true });
+
+        // Delegated mouseout: detect leaving a video card
+        document.addEventListener('mouseout', (e) => {
+            const fromCard = e.target.closest('.video-card');
+            if (!fromCard) return;
+
+            const toCard = e.relatedTarget ? e.relatedTarget.closest('.video-card') : null;
+            if (toCard === fromCard) {
+                // Moving between elements inside the same card
+                return;
+            }
+
+            if (!toCard) {
+                // Moving outside all video cards
+                hideThumbnail();
+            } else {
+                // Moving directly to another card
+                const thumbImg = toCard.querySelector('.video-thumbnail');
+                const nextUrl = toCard.dataset.thumbnail || (thumbImg ? thumbImg.src : null);
+                if (nextUrl) {
+                    showThumbnail(nextUrl);
+                }
+            }
+        }, { passive: true });
+
+        window.addEventListener('blur', hideThumbnail);
+        document.addEventListener('mouseleave', hideThumbnail);
+    };
+
+    initDynamicThumbnailBackground();
 
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);

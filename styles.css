@@ -96,6 +96,51 @@ body {
     pointer-events: none;
     will-change: transform;
     box-shadow: 0 30px 80px rgba(10, 15, 45, 0.35);
+    z-index: 1;
+}
+
+/* ==========================================================================
+   Dynamic Video Thumbnail Background on Card Hover
+   - Completely SHARP and CLEAR full-page background
+   - Zero global blur, fog, haze, milky overlay, or filters
+   - Smooth crossfade when moving between video cards
+   - Smooth restore to normal background when cursor leaves video cards
+   ========================================================================== */
+.dynamic-thumbnail-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.dynamic-thumbnail-bg.active {
+    opacity: 1;
+}
+
+.dynamic-bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity;
+    filter: none !important;
+    -webkit-filter: none !important;
+}
+
+.dynamic-bg-layer.visible {
+    opacity: 1;
 }
 
 .wave-purple-1 {
@@ -183,6 +228,7 @@ body {
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
+    z-index: 3;
     box-shadow: 0 12px 32px rgba(15, 20, 50, 0.35),
                 inset -4px -4px 10px rgba(0, 0, 0, 0.35),
                 inset 6px 6px 12px rgba(255, 255, 255, 0.8);
@@ -707,11 +753,11 @@ body {
     gap: 2.5rem;
 }
 
-/* Video Card Content (Identical Luminous Frosted Glass as Bottom Bar) */
+/* Video Card Content (Slightly clearer frosted glass: 24px blur, ~14% reduction from 28px) */
 .video-card {
     background: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(28px) saturate(150%);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
     border: 1.5px solid rgba(255, 255, 255, 0.42);
     border-radius: 28px;
     overflow: hidden;
@@ -734,8 +780,8 @@ body {
 
 .light-mode .video-card {
     background: rgba(255, 255, 255, 0.70);
-    backdrop-filter: blur(28px) saturate(150%);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
     border: 1.5px solid rgba(255, 255, 255, 0.85);
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.08),
                inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
