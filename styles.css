@@ -1078,48 +1078,6 @@ body {
 }
 
 /* ==========================================================================
-   Aurora Border Shimmer Animation
-   ========================================================================== */
-@keyframes auroraRotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.aurora-glass {
-    position: relative;
-    z-index: 1;
-}
-
-.aurora-glass::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    border-radius: inherit;
-    background: var(--aurora-gradient);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    animation: auroraRotate 4s linear infinite;
-    /* Use a mask so it's only visible at the edges */
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    padding: 1.5px;
-}
-
-.aurora-glass:hover::before {
-    opacity: 0.7;
-}
-
-.light-mode .aurora-glass:hover::before {
-    opacity: 0.45;
-}
-
-/* ==========================================================================
    Glass Ripple Effect
    ========================================================================== */
 .glass-ripple {

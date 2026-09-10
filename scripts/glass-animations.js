@@ -590,34 +590,6 @@
         });
     }
 
-    // =========================================================================
-    //  8. AURORA BORDER TRIGGER — Add class to elements for CSS animation
-    // =========================================================================
-    function initAuroraBorders() {
-        // Add aurora-border class to key glass elements for the CSS animation
-        const auroraTargets = document.querySelectorAll(
-            '.video-card, .category-tabs, .seo-card, .seo-faq-card'
-        );
-
-        auroraTargets.forEach((el) => {
-            el.classList.add('aurora-glass');
-        });
-
-        // For dynamically added video cards
-        const videoGrid = document.getElementById('video-grid');
-        if (videoGrid) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === 1 && node.classList.contains('video-card')) {
-                            node.classList.add('aurora-glass');
-                        }
-                    });
-                });
-            });
-            observer.observe(videoGrid, { childList: true });
-        }
-    }
 
     // =========================================================================
     //  9. STAGGERED ENTRANCE FOR CATEGORY TABS
@@ -650,7 +622,6 @@
         initFrostedReveal();
         initGlassRipple();
         initHeaderParallax();
-        initAuroraBorders();
         initTabEntrance();
     }
 
