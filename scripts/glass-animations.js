@@ -118,7 +118,7 @@
     }
 
     // =========================================================================
-    //  2. ENHANCED 3D CARD TILT WITH FROSTED GLARE (Desktop only)
+    //  2. SMOOTH CARD HOVER LIFT (Desktop only, 2D to preserve backdrop-filter)
     // =========================================================================
     function initCardTilt() {
         if (!isDesktop) return;
@@ -126,33 +126,17 @@
         const videoGrid = document.getElementById('video-grid');
         if (!videoGrid) return;
 
-        // Smooth tilt using GSAP
         videoGrid.addEventListener('mousemove', (e) => {
             const card = e.target.closest('.video-card');
             if (!card) return;
 
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-
-            const tiltX = (y - 0.5) * -6;
-            const tiltY = (x - 0.5) * 6;
-
             gsap.to(card, {
-                rotateX: tiltX,
-                rotateY: tiltY,
-                scale: 1.018,
-                duration: 0.4,
+                y: -6,
+                scale: 1.015,
+                duration: 0.35,
                 ease: 'power2.out',
                 overwrite: 'auto'
             });
-
-            // Frosted glare effect
-            const glare = card.querySelector('.card-glare');
-            if (glare) {
-                glare.style.opacity = '0.8';
-                glare.style.background = `radial-gradient(circle 350px at ${x * 100}% ${y * 100}%, rgba(255, 255, 255, 0.15), rgba(255, 0, 51, 0.08) 40%, transparent 75%)`;
-            }
         }, { passive: true });
 
         videoGrid.addEventListener('mouseleave', (e) => {
@@ -160,17 +144,12 @@
             if (!card) return;
             if (!card.contains(e.relatedTarget)) {
                 gsap.to(card, {
-                    rotateX: 0,
-                    rotateY: 0,
+                    y: 0,
                     scale: 1,
-                    duration: 0.6,
-                    ease: 'elastic.out(1, 0.5)',
+                    duration: 0.4,
+                    ease: 'power2.out',
                     overwrite: 'auto'
                 });
-                const glare = card.querySelector('.card-glare');
-                if (glare) {
-                    gsap.to(glare, { opacity: 0, duration: 0.4 });
-                }
             }
         });
 
@@ -180,17 +159,12 @@
             if (!card) return;
             if (!card.contains(e.relatedTarget)) {
                 gsap.to(card, {
-                    rotateX: 0,
-                    rotateY: 0,
+                    y: 0,
                     scale: 1,
-                    duration: 0.6,
-                    ease: 'elastic.out(1, 0.5)',
+                    duration: 0.4,
+                    ease: 'power2.out',
                     overwrite: 'auto'
                 });
-                const glare = card.querySelector('.card-glare');
-                if (glare) {
-                    gsap.to(glare, { opacity: 0, duration: 0.4 });
-                }
             }
         });
     }
