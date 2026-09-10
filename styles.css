@@ -81,7 +81,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 0;
     overflow: hidden;
     pointer-events: none;
 }
@@ -611,6 +611,8 @@ body {
     padding: 2rem 2rem 6rem;
     flex: 1;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 /* Loading Spinner */
@@ -712,7 +714,6 @@ body {
     -webkit-backdrop-filter: blur(28px) saturate(150%);
     border: 1.5px solid rgba(255, 255, 255, 0.42);
     border-radius: 28px;
-    padding: 12px;
     overflow: hidden;
     text-decoration: none;
     color: #ffffff;
@@ -724,10 +725,10 @@ body {
                inset 0 -1px 1px rgba(255, 255, 255, 0.12);
     position: relative;
     cursor: pointer;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.35s ease,
-                border-color 0.35s ease,
-                background-color 0.35s ease;
+    transition: transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease,
+                background-color 0.3s ease;
     will-change: transform;
 }
 
@@ -771,9 +772,7 @@ body {
     width: 100%;
     padding-top: 56.25%; /* 16:9 Aspect Ratio */
     overflow: hidden;
-    border-radius: 18px;
-    background-color: rgba(0, 0, 0, 0.25);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .video-thumbnail {
@@ -783,7 +782,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 18px;
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -857,7 +855,7 @@ body {
 }
 
 .card-content {
-    padding: 1.1rem 0.5rem 0.3rem 0.5rem;
+    padding: 1.4rem 1.4rem 1.2rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -1097,7 +1095,7 @@ body {
 
 /* Page Load: Container content fades in */
 .container {
-    animation: subtleScaleIn 0.35s ease-out 0.15s both;
+    opacity: 1;
 }
 
 /* Page Load: Reader hero and content */
@@ -1192,7 +1190,7 @@ body {
 
 /* --- SEO Card Scroll Reveal --- */
 .seo-section {
-    animation: subtleScaleIn 0.35s ease-out 0.25s both;
+    opacity: 1;
 }
 
 /* --- Touch & Mobile Interaction Tweaks --- */

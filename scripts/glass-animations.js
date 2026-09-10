@@ -239,35 +239,17 @@
     //  4. FROSTED GLASS SCROLL REVEAL (GSAP ScrollTrigger)
     // =========================================================================
     function initFrostedReveal() {
-        // Target elements that should reveal from frosted blur
+        // Target elements that should reveal
         const revealTargets = document.querySelectorAll(
-            '.video-card, .seo-card, .seo-faq-card, .faq-item, .site-footer .footer-col, .top-guide-bar, .load-more-container'
+            '.seo-card, .seo-faq-card, .faq-item, .site-footer .footer-col, .top-guide-bar, .load-more-container'
         );
 
         if (!revealTargets.length) return;
 
         revealTargets.forEach((el) => {
             el.classList.add('glass-reveal');
+            animateReveal(el);
         });
-
-        // Use a MutationObserver to catch dynamically-added video cards
-        const videoGrid = document.getElementById('video-grid');
-        if (videoGrid) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === 1 && node.classList.contains('video-card')) {
-                            node.classList.add('glass-reveal');
-                            animateReveal(node);
-                        }
-                    });
-                });
-            });
-            observer.observe(videoGrid, { childList: true });
-        }
-
-        // Animate existing elements
-        revealTargets.forEach((el) => animateReveal(el));
     }
 
     function animateReveal(el) {
