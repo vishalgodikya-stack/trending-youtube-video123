@@ -1,6 +1,6 @@
 :root {
     --bg-color: #08090d;
-    --card-bg: rgba(14, 16, 24, 0.42);
+    --card-bg: rgba(14, 16, 24, 0.40);
     --card-border: rgba(255, 255, 255, 0.12);
     --text-primary: #ffffff;
     --text-secondary: #9094a6;
@@ -97,7 +97,7 @@ body {
    ========================================================================== */
 #ambient-backdrop-container {
     position: absolute;
-    inset: -60px;
+    inset: 0;
     pointer-events: none;
     overflow: hidden;
     z-index: -2;
@@ -105,36 +105,36 @@ body {
 
 .ambient-backdrop-layer {
     position: absolute;
-    inset: -40px;
+    inset: 0;
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
-    filter: blur(85px) saturate(230%) brightness(0.65);
+    /* Clear, crisp thumbnail with cinematic dark contrast (zero blur) */
+    filter: brightness(0.38) contrast(1.1) saturate(1.15);
     opacity: 0;
-    transform: scale(1.08) translate3d(0, 0, 0);
-    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    transform: scale(1) translate3d(0, 0, 0);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity;
 }
 
 .ambient-backdrop-layer.active {
-    opacity: 0.58;
-    transform: scale(1.02) translate3d(0, 0, 0);
+    opacity: 0.82;
+    transform: scale(1) translate3d(0, 0, 0);
 }
 
 .ambient-backdrop-layer.zooming {
-    animation: ambientBreath 18s ease-in-out infinite alternate;
+    animation: ambientBreath 24s ease-in-out infinite alternate;
 }
 
 @keyframes ambientBreath {
-    0% { transform: scale(1.02) translate3d(0, 0, 0); }
-    50% { transform: scale(1.09) translate3d(15px, -10px, 0); }
-    100% { transform: scale(1.04) translate3d(-10px, 12px, 0); }
+    0% { transform: scale(1) translate3d(0, 0, 0); }
+    100% { transform: scale(1.03) translate3d(-6px, 6px, 0); }
 }
 
 #ambient-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 40%, rgba(8, 9, 13, 0.28) 0%, rgba(8, 9, 13, 0.72) 65%, rgba(8, 9, 13, 0.94) 100%);
+    background: radial-gradient(circle at 50% 30%, rgba(8, 9, 13, 0.18) 0%, rgba(8, 9, 13, 0.58) 65%, rgba(8, 9, 13, 0.88) 100%);
     pointer-events: none;
     z-index: 1;
 }
@@ -144,7 +144,7 @@ body {
     width: 480px;
     height: 400px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 0, 51, 0.25) 0%, rgba(255, 60, 90, 0.1) 45%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 0, 51, 0.22) 0%, rgba(255, 60, 90, 0.08) 45%, transparent 70%);
     filter: blur(50px);
     pointer-events: none;
     z-index: 0;
@@ -160,12 +160,12 @@ body {
 }
 
 .light-mode .ambient-backdrop-layer.active {
-    opacity: 0.32;
-    filter: blur(95px) saturate(190%) brightness(0.95);
+    opacity: 0.35;
+    filter: brightness(0.96) contrast(1.05) saturate(1.1);
 }
 
 .light-mode #ambient-vignette {
-    background: radial-gradient(circle at 50% 40%, rgba(245, 246, 249, 0.35) 0%, rgba(245, 246, 249, 0.75) 65%, rgba(245, 246, 249, 0.96) 100%);
+    background: radial-gradient(circle at 50% 30%, rgba(245, 246, 249, 0.25) 0%, rgba(245, 246, 249, 0.65) 65%, rgba(245, 246, 249, 0.9) 100%);
 }
 
 .light-mode #ambient-card-halo {
