@@ -301,12 +301,10 @@
             {
                 opacity: 0,
                 y: 35,
-                filter: 'blur(10px)',
             },
             {
                 opacity: 1,
                 y: 0,
-                filter: 'blur(0px)',
                 duration: 0.7,
                 ease: 'power3.out',
                 scrollTrigger: {

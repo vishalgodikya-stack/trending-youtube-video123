@@ -1,19 +1,19 @@
 :root {
-    --bg-color: #4370d6;
-    --card-bg: rgba(255, 255, 255, 0.12);
-    --card-border: rgba(255, 255, 255, 0.40);
+    --bg-color: #3b6ecc;
+    --card-bg: rgba(14, 22, 44, 0.28);
+    --card-border: rgba(255, 255, 255, 0.20);
     --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.88);
+    --text-secondary: rgba(255, 255, 255, 0.90);
     --accent: #ff0033;
     --accent-glow: rgba(255, 0, 51, 0.4);
-    --glass-blur: blur(24px) saturate(140%);
-    --shadow: 0 20px 50px rgba(15, 23, 60, 0.18);
+    --glass-blur: blur(24px) saturate(170%);
+    --shadow: 0 20px 50px rgba(10, 15, 40, 0.22);
 
     /* Reference Glassmorphism Tokens */
-    --glass-bg-deep: rgba(255, 255, 255, 0.15);
-    --glass-bg-light: rgba(255, 255, 255, 0.08);
-    --glass-border-glow: rgba(255, 255, 255, 0.55);
-    --glass-blur-heavy: blur(28px) saturate(150%);
+    --glass-bg-deep: rgba(14, 22, 44, 0.32);
+    --glass-bg-light: rgba(14, 22, 44, 0.20);
+    --glass-border-glow: rgba(255, 255, 255, 0.22);
+    --glass-blur-heavy: blur(24px) saturate(170%);
 }
 
 .light-mode {
@@ -62,7 +62,7 @@ html {
 }
 
 body {
-    background: linear-gradient(135deg, #3864ce 0%, #5281e8 25%, #6b9cf5 50%, #4a7ae0 80%, #355ebd 100%);
+    background: linear-gradient(135deg, #2f5ec4 0%, #4477dc 35%, #5d8cf0 65%, #3b6bcc 100%);
     color: var(--text-primary);
     min-height: 100vh;
     width: 100%;
@@ -88,80 +88,82 @@ body {
 
 /* ==========================================================================
    Reference Luminous Background: Sky Blue with Flowing Purple & Cyan Waves
+   (Sharp defined edges outside cards, diffused locally when viewed through glass)
    ========================================================================== */
 .organic-wave {
     position: absolute;
     border-radius: 50% / 40%;
-    filter: blur(42px);
     pointer-events: none;
     will-change: transform;
+    box-shadow: 0 30px 80px rgba(10, 15, 45, 0.35);
 }
 
 .wave-purple-1 {
-    width: 82vw;
-    height: 48vh;
-    max-width: 1200px;
-    max-height: 560px;
-    top: 8%;
-    left: 10%;
-    background: linear-gradient(135deg, #6c2bd9 0%, #8b45f5 40%, #a855f7 70%, #631dbd 100%);
-    transform: rotate(-16deg);
+    width: 85vw;
+    height: 50vh;
+    max-width: 1250px;
+    max-height: 580px;
+    top: 6%;
+    left: 8%;
+    background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 35%, #a855f7 70%, #581c87 100%);
+    transform: rotate(-15deg);
     border-radius: 45% 55% 70% 30% / 40% 50% 50% 60%;
     opacity: 0.94;
-    animation: waveFloat1 18s ease-in-out infinite alternate;
+    animation: waveFloat1 20s ease-in-out infinite alternate;
 }
 
 .wave-cyan-1 {
-    width: 74vw;
-    height: 38vh;
-    max-width: 1000px;
-    max-height: 420px;
-    top: 18%;
-    left: 30%;
-    background: linear-gradient(135deg, #00d2f8 0%, #00f0ff 45%, #2596ff 80%, #155dd9 100%);
-    transform: rotate(-10deg);
+    width: 76vw;
+    height: 40vh;
+    max-width: 1050px;
+    max-height: 450px;
+    top: 16%;
+    left: 28%;
+    background: linear-gradient(135deg, #00d2f8 0%, #00f0ff 40%, #2563eb 80%, #1e40af 100%);
+    transform: rotate(-9deg);
     border-radius: 55% 45% 35% 65% / 50% 60% 40% 50%;
-    opacity: 0.90;
-    animation: waveFloat2 22s ease-in-out infinite alternate-reverse;
+    opacity: 0.92;
+    animation: waveFloat2 24s ease-in-out infinite alternate-reverse;
 }
 
 .wave-purple-2 {
-    width: 86vw;
-    height: 52vh;
+    width: 88vw;
+    height: 54vh;
     max-width: 1300px;
-    max-height: 600px;
-    top: 50%;
-    left: -5%;
-    background: linear-gradient(125deg, #5b1bbb 0%, #853fed 50%, #ab5ff8 100%);
-    transform: rotate(14deg);
+    max-height: 620px;
+    top: 48%;
+    left: -6%;
+    background: linear-gradient(125deg, #4c1d95 0%, #7c3aed 40%, #9333ea 75%, #c026d3 100%);
+    transform: rotate(12deg);
     border-radius: 65% 35% 50% 50% / 40% 50% 50% 60%;
-    opacity: 0.88;
-    animation: waveFloat1 20s ease-in-out infinite alternate-reverse;
+    opacity: 0.92;
+    animation: waveFloat1 22s ease-in-out infinite alternate-reverse;
 }
 
 .wave-cyan-2 {
-    width: 68vw;
-    height: 38vh;
-    max-width: 950px;
-    max-height: 450px;
-    top: 66%;
+    width: 70vw;
+    height: 42vh;
+    max-width: 980px;
+    max-height: 480px;
+    top: 64%;
     right: -5%;
-    background: linear-gradient(140deg, #00e5ff 0%, #00b4d8 50%, #0284c7 100%);
-    transform: rotate(-20deg);
+    background: linear-gradient(140deg, #06b6d4 0%, #00e5ff 45%, #0284c7 80%, #1d4ed8 100%);
+    transform: rotate(-18deg);
     border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
-    opacity: 0.86;
-    animation: waveFloat2 24s ease-in-out infinite alternate;
+    opacity: 0.90;
+    animation: waveFloat2 26s ease-in-out infinite alternate;
 }
 
 .wave-violet-center {
-    width: 58vw;
-    height: 44vh;
-    max-width: 820px;
-    top: 34%;
-    left: 18%;
-    background: radial-gradient(circle, #7e22ce 0%, #581c87 55%, transparent 75%);
-    opacity: 0.82;
-    filter: blur(50px);
+    width: 62vw;
+    height: 46vh;
+    max-width: 860px;
+    top: 32%;
+    left: 16%;
+    background: linear-gradient(130deg, #a21caf 0%, #7e22ce 50%, #4338ca 100%);
+    border-radius: 50% 50% 45% 55% / 45% 55% 50% 50%;
+    opacity: 0.88;
+    animation: waveFloat1 18s ease-in-out infinite alternate;
 }
 
 @keyframes waveFloat1 {
@@ -517,14 +519,14 @@ body {
     align-items: center;
     gap: 4px;
     padding: 6px;
-    background: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(28px) saturate(150%);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
-    border: 1.5px solid rgba(255, 255, 255, 0.42);
+    background: rgba(14, 22, 44, 0.35);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 50px;
-    box-shadow: 0 16px 50px rgba(15, 23, 60, 0.22),
-               inset 0 1.5px 1.5px rgba(255, 255, 255, 0.55),
-               inset 0 -1px 1px rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 50px rgba(10, 15, 40, 0.28),
+               inset 0 1.5px 1.5px rgba(255, 255, 255, 0.35),
+               inset 0 -1px 1px rgba(255, 255, 255, 0.08);
     z-index: 200;
     max-width: min(96vw, 680px);
     overflow-x: auto;
@@ -706,20 +708,21 @@ body {
 
 /* Video Card Content (Reference Luminous Glassmorphism) */
 .video-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
-    border: 1.5px solid var(--card-border);
+    background: rgba(14, 22, 44, 0.24);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     border-radius: 28px;
+    padding: 14px;
     overflow: hidden;
     text-decoration: none;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     height: 100%;
-    box-shadow: 0 20px 50px rgba(15, 23, 60, 0.18),
+    box-shadow: 0 24px 60px rgba(10, 15, 45, 0.28),
                inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.45),
-               inset 0 -1px 1px 0 rgba(255, 255, 255, 0.12);
+               inset 0 -1px 1px 0 rgba(255, 255, 255, 0.10);
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
@@ -732,6 +735,10 @@ body {
 }
 
 .light-mode .video-card {
+    background: rgba(255, 255, 255, 0.50);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.08),
                inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
                inset 0 -1px 0 0 rgba(0, 0, 0, 0.02);
@@ -747,18 +754,18 @@ body {
 }
 
 .video-card:hover {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.65);
-    box-shadow: 0 28px 65px rgba(15, 23, 60, 0.28),
-               inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.65),
-               0 0 30px rgba(255, 255, 255, 0.22);
+    background: rgba(14, 22, 44, 0.34);
+    border-color: rgba(255, 255, 255, 0.38);
+    box-shadow: 0 32px 75px rgba(10, 15, 45, 0.38),
+               inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.60),
+               0 0 25px rgba(255, 255, 255, 0.15);
 }
 
 .light-mode .video-card:hover {
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 28px 60px rgba(0,0,0,0.14),
+    background: rgba(255, 255, 255, 0.65);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.12),
                inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
-    border-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.85);
 }
 
 .thumbnail-container {
@@ -766,7 +773,9 @@ body {
     width: 100%;
     padding-top: 56.25%; /* 16:9 Aspect Ratio */
     overflow: hidden;
-    background-color: rgba(0,0,0,0.2);
+    border-radius: 18px;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
 .video-thumbnail {
@@ -776,6 +785,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 18px;
     transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -849,14 +859,16 @@ body {
 }
 
 .card-content {
-    padding: 1.5rem;
+    padding: 1.1rem 0.5rem 0.3rem 0.5rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-}.video-title {
-    font-size: 1.15rem;
+}
+
+.video-title {
+    font-size: 1.12rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.9rem;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -864,7 +876,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
@@ -942,10 +954,10 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.14);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     padding: 4px 10px;
     border-radius: 20px;
     margin-bottom: 0.8rem;
@@ -978,23 +990,25 @@ body {
 .watch-direct-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     font-size: 0.8rem;
-    color: var(--text-secondary);
-    padding: 4px 10px;
-    border-radius: 15px;
-    background: var(--card-bg);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.92);
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--card-border);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     transition: all 0.2s ease;
     text-decoration: none;
 }
 
 .watch-direct-btn:hover {
-    color: var(--text-primary);
-    border-color: var(--accent);
-    background: rgba(255, 0, 51, 0.15);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Utilities */
@@ -1223,14 +1237,14 @@ body {
 }
 
 .seo-card, .seo-faq-card {
-    background: rgba(255, 255, 255, 0.10);
-    border: 1.5px solid rgba(255, 255, 255, 0.38);
+    background: rgba(14, 22, 44, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.20);
     border-radius: 28px;
     padding: 3rem 3.5rem;
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
-    box-shadow: 0 20px 50px rgba(15, 23, 60, 0.18), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(255, 255, 255, 0.1);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    box-shadow: 0 20px 50px rgba(10, 15, 40, 0.22), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(255, 255, 255, 0.08);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     position: relative;
 }
 
@@ -1239,8 +1253,9 @@ body {
 }
 
 .seo-card:hover, .seo-faq-card:hover {
-    border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 24px 60px rgba(15, 23, 60, 0.25), inset 0 1.5px 2px rgba(255, 255, 255, 0.6);
+    background: rgba(14, 22, 44, 0.36);
+    border-color: rgba(255, 255, 255, 0.32);
+    box-shadow: 0 28px 65px rgba(10, 15, 40, 0.30), inset 0 1.5px 2px rgba(255, 255, 255, 0.45);
 }
 
 .seo-card h2 {
