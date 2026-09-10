@@ -710,6 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const card = document.createElement('article');
             card.className = 'video-card';
+            card.dataset.thumbnail = tNavUrl;
             card.title = `Explore "${cleanTopic}" on YouTube`;
             
             // Clicking card explores the trending topic on YouTube
@@ -782,6 +783,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayedVideoCount = 0;
         videoGrid.innerHTML = '';
         renderNextVideoBatch();
+
+        // Notify dynamic ambient backdrop engine of top video thumbnail
+        if (currentFilteredVideos.length > 0 && currentFilteredVideos[0].thumbnail) {
+            window.dispatchEvent(new CustomEvent('trendingVideosReady', {
+                detail: { topThumbnail: currentFilteredVideos[0].thumbnail }
+            }));
+        }
     };
 
     // UI State Toggles
@@ -906,64 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAccordion('home-faq-accordion');
     setupAccordion('seo-guide-accordion');
 
-    // High-Tech Interactive Cursor Red Glow (Desktop pointer)
-    const cursorGlow = document.getElementById('cursor-glow');
-    if (cursorGlow && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        let mouseX = -9999, mouseY = -9999;
-        let currentX = -9999, currentY = -9999;
-        let isGlowVisible = false;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            if (!isGlowVisible) {
-                isGlowVisible = true;
-                cursorGlow.classList.add('active');
-            }
-        }, { passive: true });
-
-        const animateGlow = () => {
-            if (isGlowVisible) {
-                currentX += (mouseX - currentX) * 0.12;
-                currentY += (mouseY - currentY) * 0.12;
-                cursorGlow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-            }
-            requestAnimationFrame(animateGlow);
-        };
-        requestAnimationFrame(animateGlow);
-    }
-
-    // 3D Card Tilt & Specular Glare Physics (Desktop pointer)
-    if (videoGrid && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-        videoGrid.addEventListener('mousemove', (e) => {
-            const card = e.target.closest('.video-card');
-            if (!card) return;
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-
-            const tiltX = (y - 0.5) * -4;
-            const tiltY = (x - 0.5) * 4;
-
-            card.style.transform = `perspective(2000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
-
-            const glare = card.querySelector('.card-glare');
-            if (glare) {
-                glare.style.opacity = '0.7';
-                glare.style.background = `radial-gradient(circle 320px at ${x * 100}% ${y * 100}%, rgba(255, 255, 255, 0.12), rgba(255, 0, 51, 0.06) 45%, transparent 80%)`;
-            }
-        }, { passive: true });
-
-        videoGrid.addEventListener('mouseout', (e) => {
-            const card = e.target.closest('.video-card');
-            if (!card) return;
-            if (!card.contains(e.relatedTarget)) {
-                card.style.transform = 'perspective(2000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-                const glare = card.querySelector('.card-glare');
-                if (glare) glare.style.opacity = '0';
-            }
-        });
-    }
+    // NOTE: Cursor glow and 3D card tilt are now handled by scripts/glass-animations.js (GSAP-powered)
 
     // Initial Bootstrap
     fetchTrendingVideos(savedRegion, currentCategory, isGlobal);
