@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryPill.style.transform = `translateX(${offsetLeft}px)`;
         categoryPill.style.width = `${width}px`;
     };
+    window.updateCategoryPill = updatePillPosition;
 
     // Position pill on start and window resize
     const initialActiveTab = document.querySelector('.category-tab.active');
@@ -42,11 +43,22 @@ document.addEventListener('DOMContentLoaded', () => {
             window.requestAnimationFrame(() => {
                 const currentScrollY = window.scrollY;
                 if (currentScrollY > lastScrollY && currentScrollY > 80) {
-                    // Scrolling down — smoothly hide the bar
-                    if (categoryBar) categoryBar.classList.add('tabs-hidden');
+                    // Scrolling down — smoothly hide the bar and reset tabs offscreen
+                    if (categoryBar && !categoryBar.classList.contains('tabs-hidden')) {
+                        categoryBar.classList.add('tabs-hidden');
+                        if (window.resetTabEntrance) window.resetTabEntrance();
+                    }
                 } else if (currentScrollY < lastScrollY) {
-                    // Scrolling up — smoothly restore the bar
-                    if (categoryBar) categoryBar.classList.remove('tabs-hidden');
+                    // Scrolling up — smoothly restore the bar and replay entrance animation
+                    if (categoryBar && categoryBar.classList.contains('tabs-hidden')) {
+                        categoryBar.classList.remove('tabs-hidden');
+                        if (window.playTabEntrance) window.playTabEntrance(0);
+                    }
+                }
+                // When at or near the very top of the page, ensure the dock is visible and animated
+                if (currentScrollY <= 20 && categoryBar && categoryBar.classList.contains('tabs-hidden')) {
+                    categoryBar.classList.remove('tabs-hidden');
+                    if (window.playTabEntrance) window.playTabEntrance(0);
                 }
                 lastScrollY = currentScrollY;
                 scrollTicking = false;

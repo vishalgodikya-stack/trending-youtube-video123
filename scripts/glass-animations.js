@@ -236,7 +236,7 @@
     }
 
     // =========================================================================
-    //  4. FROSTED GLASS SCROLL REVEAL (GSAP ScrollTrigger)
+    //  4. FROSTED GLASS SCROLL REVEAL (IntersectionObserver Bidirectional Replay)
     // =========================================================================
     function initFrostedReveal() {
         // Target elements that should reveal
@@ -246,32 +246,58 @@
 
         if (!revealTargets.length) return;
 
+        // Set initial hidden/offset state on all target elements
         revealTargets.forEach((el) => {
             el.classList.add('glass-reveal');
-            animateReveal(el);
+            gsap.set(el, { opacity: 0, y: 35 });
         });
-    }
 
-    function animateReveal(el) {
-        gsap.fromTo(el,
-            {
-                opacity: 0,
-                y: 35,
-            },
-            {
-                opacity: 1,
-                y: 0,
-                duration: 0.7,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: el,
-                    start: 'top 92%',
-                    end: 'top 60%',
-                    toggleActions: 'play none none none',
-                    once: true
-                }
-            }
-        );
+        // Use IntersectionObserver to reliably detect enter and leave in both scroll directions
+        if ('IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const el = entry.target;
+                    if (entry.isIntersecting) {
+                        // Whenever element ENTERS the viewport (from top or bottom):
+                        // Play existing entrance animation from beginning
+                        gsap.fromTo(el,
+                            {
+                                opacity: 0,
+                                y: 35,
+                            },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.7,
+                                ease: 'power3.out',
+                                overwrite: 'auto'
+                            }
+                        );
+                    } else {
+                        // Whenever element LEAVES the viewport completely (scrolled past in either direction):
+                        // Reset to initial hidden/offset state silently offscreen
+                        gsap.set(el, {
+                            opacity: 0,
+                            y: 35,
+                            overwrite: 'auto'
+                        });
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0,
+                rootMargin: '0px 0px -20px 0px'
+            });
+
+            revealTargets.forEach((el) => {
+                revealObserver.observe(el);
+            });
+        } else {
+            // Fallback for older browsers
+            revealTargets.forEach((el) => {
+                gsap.to(el, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
+            });
+        }
     }
 
     // =========================================================================
@@ -400,21 +426,96 @@
 
 
     // =========================================================================
-    //  9. STAGGERED ENTRANCE FOR CATEGORY TABS
+    //  9. STAGGERED ENTRANCE & BIDIRECTIONAL REPLAY FOR CATEGORY TABS DOCK
     // =========================================================================
-    function initTabEntrance() {
-        const tabs = document.querySelectorAll('.category-tab');
-        if (!tabs.length) return;
+    let isTabsDockInView = false;
 
-        gsap.from(tabs, {
+    function playTabEntrance(delay = 0) {
+        const tabs = document.querySelectorAll('.category-tab');
+        const categoryBar = document.getElementById('category-tabs');
+        const categoryPill = document.getElementById('category-pill-indicator');
+        if (!tabs.length || !categoryBar) return;
+        if (isTabsDockInView) return;
+        isTabsDockInView = true;
+
+        if (categoryPill) {
+            gsap.fromTo(categoryPill,
+                { opacity: 0, scale: 0.85 },
+                { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', delay: delay + 0.08, overwrite: 'auto' }
+            );
+        }
+
+        gsap.fromTo(tabs,
+            {
+                y: 30,
+                opacity: 0,
+                scale: 0.85
+            },
+            {
+                y: 0,
+                opacity: 1,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.06,
+                ease: 'back.out(1.7)',
+                delay: delay,
+                overwrite: 'auto',
+                onComplete: () => {
+                    const activeTab = document.querySelector('.category-tab.active');
+                    if (activeTab && window.updateCategoryPill) {
+                        window.updateCategoryPill(activeTab);
+                    }
+                }
+            }
+        );
+    }
+
+    function resetTabEntrance() {
+        const tabs = document.querySelectorAll('.category-tab');
+        const categoryPill = document.getElementById('category-pill-indicator');
+        if (!tabs.length) return;
+        isTabsDockInView = false;
+
+        gsap.set(tabs, {
             y: 30,
             opacity: 0,
             scale: 0.85,
-            duration: 0.5,
-            stagger: 0.06,
-            ease: 'back.out(1.7)',
-            delay: 0.8
+            overwrite: 'auto'
         });
+
+        if (categoryPill) {
+            gsap.set(categoryPill, { opacity: 0, overwrite: 'auto' });
+        }
+    }
+
+    // Export so app.js and scroll handlers can trigger reset & replay
+    window.playTabEntrance = playTabEntrance;
+    window.resetTabEntrance = resetTabEntrance;
+
+    function initTabEntrance() {
+        const categoryBar = document.getElementById('category-tabs');
+        if (!categoryBar) return;
+
+        // Initial entrance on load with exact existing delay (0.8s)
+        playTabEntrance(0.8);
+
+        // IntersectionObserver for the category dock
+        if ('IntersectionObserver' in window) {
+            const dockObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !categoryBar.classList.contains('tabs-hidden')) {
+                        playTabEntrance(0);
+                    } else if (!entry.isIntersecting) {
+                        resetTabEntrance();
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.1
+            });
+
+            dockObserver.observe(categoryBar);
+        }
     }
 
     // =========================================================================
