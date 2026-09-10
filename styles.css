@@ -754,31 +754,65 @@ body {
 }
 
 /* Video Card Content (Slightly clearer frosted glass: 24px blur, ~14% reduction from 28px) */
-.video-card {
-    background: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    border: 1.5px solid rgba(255, 255, 255, 0.42);
-    border-radius: 28px;
-    overflow: hidden;
+/* Video Card Content (Slightly clearer frosted glass: 24px blur, ~14% reduction from 28px) */
+.video-card,
+.border-glow-card {
+    --edge-proximity: 0;
+    --cursor-angle: 45deg;
+    --edge-sensitivity: 25;
+    --color-sensitivity: calc(var(--edge-sensitivity) + 15);
+    --border-radius: 28px;
+    --glow-padding: 24px;
+    --cone-spread: 22;
+
+    /* Specular crisp glow palette */
+    --glow-color: hsl(210deg 100% 92%);
+    --glow-color-60: hsl(210deg 100% 92% / 60%);
+    --glow-color-50: hsl(210deg 100% 92% / 50%);
+    --glow-color-40: hsl(210deg 100% 92% / 40%);
+    --glow-color-30: hsl(210deg 100% 92% / 30%);
+    --glow-color-20: hsl(210deg 100% 92% / 20%);
+    --glow-color-10: hsl(210deg 100% 92% / 10%);
+
+    /* Prismatic chromatic dispersion mesh */
+    --gradient-one: radial-gradient(at 80% 55%, hsla(268, 100%, 78%, 0.85) 0px, transparent 50%);
+    --gradient-two: radial-gradient(at 69% 34%, hsla(349, 100%, 75%, 0.85) 0px, transparent 50%);
+    --gradient-three: radial-gradient(at 8% 6%, hsla(192, 100%, 65%, 0.85) 0px, transparent 50%);
+    --gradient-four: radial-gradient(at 41% 38%, hsla(210, 100%, 72%, 0.85) 0px, transparent 50%);
+    --gradient-five: radial-gradient(at 86% 85%, hsla(186, 100%, 76%, 0.85) 0px, transparent 50%);
+    --gradient-six: radial-gradient(at 82% 18%, hsla(280, 100%, 78%, 0.85) 0px, transparent 50%);
+    --gradient-seven: radial-gradient(at 51% 4%, hsla(355, 100%, 74%, 0.85) 0px, transparent 50%);
+    --gradient-base: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(56, 189, 248, 0.8) 50%, rgba(192, 132, 252, 0.8) 100%);
+
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: visible;
     text-decoration: none;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1.5px solid rgba(255, 255, 255, 0.42);
     box-shadow: 0 16px 50px rgba(15, 23, 60, 0.22),
                inset 0 1.5px 1.5px rgba(255, 255, 255, 0.55),
                inset 0 -1px 1px rgba(255, 255, 255, 0.12);
-    position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease,
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
                 box-shadow 0.3s ease,
                 border-color 0.3s ease,
                 background-color 0.3s ease;
     will-change: transform;
 }
 
-.light-mode .video-card {
+.category-tabs.border-glow-card {
+    --border-radius: 50px;
+}
+
+.light-mode .video-card,
+.light-mode .border-glow-card {
     background: rgba(255, 255, 255, 0.70);
     backdrop-filter: blur(24px) saturate(150%);
     -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -786,27 +820,141 @@ body {
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.08),
                inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
                inset 0 -1px 0 0 rgba(0, 0, 0, 0.02);
+    --glow-color: hsl(220deg 80% 55%);
+    --glow-color-60: hsl(220deg 80% 55% / 60%);
+    --glow-color-50: hsl(220deg 80% 55% / 50%);
+    --glow-color-40: hsl(220deg 80% 55% / 40%);
+    --glow-color-30: hsl(220deg 80% 55% / 30%);
+    --glow-color-20: hsl(220deg 80% 55% / 20%);
+    --glow-color-10: hsl(220deg 80% 55% / 10%);
+    --gradient-base: linear-gradient(135deg, rgba(147, 51, 234, 0.6) 0%, rgba(2, 132, 199, 0.6) 50%, rgba(225, 29, 72, 0.6) 100%);
+}
+
+.light-mode .video-card > .edge-light,
+.light-mode .border-glow-card > .edge-light {
+    mix-blend-mode: multiply;
+}
+
+/* Directional Specular Border Highlight (follows cursor angle and edge proximity) */
+.video-card::before,
+.border-glow-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1.5px solid transparent;
+    background:
+        linear-gradient(transparent 0 100%) padding-box,
+        var(--gradient-one) border-box,
+        var(--gradient-two) border-box,
+        var(--gradient-three) border-box,
+        var(--gradient-four) border-box,
+        var(--gradient-five) border-box,
+        var(--gradient-six) border-box,
+        var(--gradient-seven) border-box,
+        var(--gradient-base) border-box;
+
+    opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+
+    mask-image:
+        conic-gradient(
+            from var(--cursor-angle) at center,
+            black calc(var(--cone-spread) * 1%),
+            transparent calc((var(--cone-spread) + 14) * 1%),
+            transparent calc((100 - var(--cone-spread) - 14) * 1%),
+            black calc((100 - var(--cone-spread)) * 1%)
+        );
+    -webkit-mask-image:
+        conic-gradient(
+            from var(--cursor-angle) at center,
+            black calc(var(--cone-spread) * 1%),
+            transparent calc((var(--cone-spread) + 14) * 1%),
+            transparent calc((100 - var(--cone-spread) - 14) * 1%),
+            black calc((100 - var(--cone-spread)) * 1%)
+        );
+
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.2s ease-out;
+}
+
+/* When not hovered and not in sweep active, smoothly fade out */
+.video-card:not(:hover):not(.sweep-active)::before,
+.border-glow-card:not(:hover):not(.sweep-active)::before {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+/* Outer Specular Glow Aura Layer (blooms outside the edge towards cursor angle) */
+.video-card > .edge-light,
+.border-glow-card > .edge-light {
+    position: absolute;
+    inset: calc(var(--glow-padding) * -1);
+    border-radius: calc(var(--border-radius) + var(--glow-padding));
+    pointer-events: none;
+    z-index: 0;
+
+    mask-image:
+        conic-gradient(
+            from var(--cursor-angle) at center,
+            black 2.5%,
+            transparent 12%,
+            transparent 88%,
+            black 97.5%
+        );
+    -webkit-mask-image:
+        conic-gradient(
+            from var(--cursor-angle) at center,
+            black 2.5%,
+            transparent 12%,
+            transparent 88%,
+            black 97.5%
+        );
+
+    opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+    mix-blend-mode: screen;
+    transition: opacity 0.2s ease-out;
+}
+
+.video-card:not(:hover):not(.sweep-active) > .edge-light,
+.border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+.video-card > .edge-light::before,
+.border-glow-card > .edge-light::before {
+    content: "";
+    position: absolute;
+    inset: var(--glow-padding);
+    border-radius: var(--border-radius);
+    box-shadow:
+        inset 0 0 0 1px var(--glow-color, rgba(255, 255, 255, 0.95)),
+        0 0 2px 0 var(--glow-color-60, rgba(255, 255, 255, 0.6)),
+        0 0 6px 0 var(--glow-color-40, rgba(255, 255, 255, 0.4)),
+        0 0 16px 1px var(--glow-color-30, rgba(56, 189, 248, 0.3)),
+        0 0 28px 2px var(--glow-color-20, rgba(192, 132, 252, 0.2)),
+        0 0 45px 3px var(--glow-color-10, rgba(244, 114, 182, 0.1));
 }
 
 .card-glare {
     display: none;
 }
 
-/* Remove foggy inner shine */
 .video-card::after {
     display: none;
 }
 
 .video-card:hover {
-    transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.24);
-    border-color: rgba(255, 255, 255, 0.65);
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.20);
+    border-color: rgba(255, 255, 255, 0.55);
     box-shadow: 0 24px 60px rgba(15, 23, 60, 0.30),
-               inset 0 1.5px 2px rgba(255, 255, 255, 0.75),
-               0 0 30px rgba(255, 255, 255, 0.20);
+               inset 0 1.5px 2px rgba(255, 255, 255, 0.75);
 }
 
 .light-mode .video-card:hover {
+    transform: translateY(-4px);
     background: rgba(255, 255, 255, 0.85);
     box-shadow: 0 24px 55px rgba(0, 0, 0, 0.12),
                inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
@@ -819,6 +967,8 @@ body {
     padding-top: 56.25%; /* 16:9 Aspect Ratio */
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 26px 26px 0 0;
+    z-index: 1;
 }
 
 .video-thumbnail {

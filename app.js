@@ -721,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 : `<div class="video-duration">${formatDuration(video.duration)}</div>`;
             
             const card = document.createElement('article');
-            card.className = 'video-card';
+            card.className = 'video-card border-glow-card';
             card.dataset.thumbnail = tNavUrl;
             card.title = `Explore "${cleanTopic}" on YouTube`;
             
@@ -735,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = 'translateY(30px)';
             
             card.innerHTML = `
-                <div class="card-glare"></div>
+                <span class="edge-light" aria-hidden="true"></span>
                 <div class="thumbnail-container">
                     <img src="${tNavUrl}" alt="${video.title}" class="video-thumbnail" loading="lazy">
                     <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="play-overlay" title="Watch direct video" onclick="event.stopPropagation();">
@@ -768,10 +768,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             videoGrid.appendChild(card);
             
-            // Trigger animation sequentially, then clear inline transform so 3D tilt can control it
+            // Trigger animation sequentially, clear inline transform, and launch intro specular sweep
             setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = '';
+                if (window.triggerCardGlowSweep) {
+                    window.triggerCardGlowSweep(card, 0.12 + (batchIndex * 0.08));
+                }
             }, 50 + (batchIndex * 50));
         });
 

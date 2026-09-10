@@ -118,54 +118,126 @@
     }
 
     // =========================================================================
-    //  2. SMOOTH CARD HOVER LIFT (Desktop only, 2D to preserve backdrop-filter)
+    //  2. BORDERGLOW DIRECTIONAL GLASS ENGINE (Pointer tracking & Intro Sweep)
     // =========================================================================
-    function initCardTilt() {
+    function getCenterOfElement(el) {
+        const rect = el.getBoundingClientRect();
+        return [rect.width / 2, rect.height / 2];
+    }
+
+    function getEdgeProximity(el, x, y) {
+        const [cx, cy] = getCenterOfElement(el);
+        const dx = x - cx;
+        const dy = y - cy;
+        let kx = Infinity;
+        let ky = Infinity;
+        if (dx !== 0) kx = cx / Math.abs(dx);
+        if (dy !== 0) ky = cy / Math.abs(dy);
+        return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+    }
+
+    function getCursorAngle(el, x, y) {
+        const [cx, cy] = getCenterOfElement(el);
+        const dx = x - cx;
+        const dy = y - cy;
+        if (dx === 0 && dy === 0) return 0;
+        const radians = Math.atan2(dy, dx);
+        let degrees = radians * (180 / Math.PI) + 90;
+        if (degrees < 0) degrees += 360;
+        return degrees;
+    }
+
+    // Intro specular sweep inspired by BorderGlow component (vanilla JS + GSAP)
+    function triggerCardGlowSweep(card, delay = 0) {
+        if (!card || card.classList.contains('sweep-active')) return;
+        card.classList.add('sweep-active');
+
+        const sweepState = { angle: 110, proximity: 0 };
+        card.style.setProperty('--cursor-angle', '110deg');
+        card.style.setProperty('--edge-proximity', '0');
+
+        gsap.timeline({
+            delay: delay,
+            onComplete: () => {
+                card.classList.remove('sweep-active');
+                if (!card.matches(':hover')) {
+                    card.style.setProperty('--edge-proximity', '0');
+                }
+            }
+        })
+        .to(sweepState, {
+            proximity: 92,
+            duration: 0.35,
+            ease: 'power2.out',
+            onUpdate: () => {
+                if (card.classList.contains('sweep-active')) {
+                    card.style.setProperty('--edge-proximity', sweepState.proximity.toFixed(1));
+                }
+            }
+        })
+        .to(sweepState, {
+            angle: 470,
+            duration: 1.25,
+            ease: 'power1.inOut',
+            onUpdate: () => {
+                if (card.classList.contains('sweep-active')) {
+                    card.style.setProperty('--cursor-angle', `${sweepState.angle.toFixed(1)}deg`);
+                }
+            }
+        }, '<0.08')
+        .to(sweepState, {
+            proximity: 0,
+            duration: 0.45,
+            ease: 'power2.in',
+            onUpdate: () => {
+                if (card.classList.contains('sweep-active')) {
+                    card.style.setProperty('--edge-proximity', sweepState.proximity.toFixed(1));
+                }
+            }
+        }, '-=0.35');
+    }
+
+    window.triggerCardGlowSweep = triggerCardGlowSweep;
+
+    function initBorderGlow() {
         if (!isDesktop) return;
 
-        const videoGrid = document.getElementById('video-grid');
-        if (!videoGrid) return;
-
-        videoGrid.addEventListener('mousemove', (e) => {
-            const card = e.target.closest('.video-card');
+        // Pointer move delegation: smooth real-time edge proximity & cursor angle tracking
+        document.addEventListener('pointermove', (e) => {
+            const card = e.target.closest('.video-card, .border-glow-card');
             if (!card) return;
 
-            gsap.to(card, {
-                y: -6,
-                scale: 1.015,
-                duration: 0.35,
-                ease: 'power2.out',
-                overwrite: 'auto'
-            });
+            // If an intro sweep is running on this card, cancel it so user cursor takes over immediately
+            if (card.classList.contains('sweep-active')) {
+                card.classList.remove('sweep-active');
+            }
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const edge = getEdgeProximity(card, x, y);
+            const angle = getCursorAngle(card, x, y);
+
+            card.style.setProperty('--edge-proximity', (edge * 100).toFixed(2));
+            card.style.setProperty('--cursor-angle', `${angle.toFixed(2)}deg`);
         }, { passive: true });
 
-        videoGrid.addEventListener('mouseleave', (e) => {
-            const card = e.target.closest('.video-card');
-            if (!card) return;
-            if (!card.contains(e.relatedTarget)) {
-                gsap.to(card, {
-                    y: 0,
-                    scale: 1,
-                    duration: 0.4,
-                    ease: 'power2.out',
-                    overwrite: 'auto'
-                });
-            }
-        });
+        // Pointer out delegation: reset proximity when leaving card
+        document.addEventListener('pointerout', (e) => {
+            const fromCard = e.target.closest('.video-card, .border-glow-card');
+            if (!fromCard) return;
 
-        // Also handle mouseout for individual cards
-        videoGrid.addEventListener('mouseout', (e) => {
-            const card = e.target.closest('.video-card');
-            if (!card) return;
-            if (!card.contains(e.relatedTarget)) {
-                gsap.to(card, {
-                    y: 0,
-                    scale: 1,
-                    duration: 0.4,
-                    ease: 'power2.out',
-                    overwrite: 'auto'
-                });
+            const toCard = e.relatedTarget ? e.relatedTarget.closest('.video-card, .border-glow-card') : null;
+            if (toCard !== fromCard) {
+                fromCard.style.setProperty('--edge-proximity', '0');
             }
+        }, { passive: true });
+
+        // Sweep initial static cards if any are present
+        const initialCards = document.querySelectorAll('.video-card, .border-glow-card');
+        initialCards.forEach((c, i) => {
+            triggerCardGlowSweep(c, 0.4 + (i * 0.08));
         });
     }
 
@@ -526,7 +598,7 @@
         initFloatingOrbs();
         initMorphingBlobs();
         initCursorGlow();
-        initCardTilt();
+        initBorderGlow();
         initFrostedReveal();
         initGlassRipple();
         initHeaderParallax();
