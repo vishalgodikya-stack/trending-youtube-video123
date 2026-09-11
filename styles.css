@@ -16,19 +16,187 @@
     --glass-blur-heavy: blur(28px) saturate(150%);
 }
 
-.light-mode {
-    --bg-color: #e8f0fe;
-    --card-bg: rgba(255, 255, 255, 0.70);
-    --card-border: rgba(255, 255, 255, 0.85);
-    --text-primary: #0a0b0e;
-    --text-secondary: #475569;
-    --accent: #e50914;
-    --accent-glow: rgba(229, 9, 20, 0.25);
-    --shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-    --glass-bg-deep: rgba(255, 255, 255, 0.82);
-    --glass-bg-light: rgba(255, 255, 255, 0.5);
-    --glass-border-glow: rgba(255, 255, 255, 0.9);
-    --glass-blur-heavy: blur(28px) saturate(150%);
+/* ==========================================================================
+   Dynamic Text Contrast for Bright Backgrounds
+   - Automatically adapts foreground text to active background brightness
+   - Bright background -> Crisp, high-contrast dark text
+   - Dark background -> Light / white text (default)
+   - Smooth 0.4s transitions, crisp sharp typography, zero global fog or milky overlay
+   - Thumbnails, buttons, play icons, and red accents remain untouched
+   ========================================================================== */
+body.bright-bg {
+    --text-primary: #090d16;
+    --text-secondary: rgba(9, 13, 22, 0.85);
+}
+
+/* Smooth color transitions between light and dark text states */
+.video-title,
+.channel-name,
+.stat,
+.video-stats,
+.topic-tag,
+.header-title h1,
+.header-subtitle,
+.header-date,
+.section-title h2,
+.section-subtitle,
+.seo-card h2,
+.seo-card p,
+.seo-card li,
+.seo-faq-card h2,
+.seo-faq-card p,
+.faq-question span,
+.faq-answer p,
+.faq-category-header h3,
+.region-select-label,
+.global-pill-label,
+.empty-state h3,
+.empty-state p,
+.site-footer,
+.footer-brand h3,
+.footer-brand p,
+.footer-col h4,
+.footer-col a,
+.footer-bottom,
+.category-tab:not(.active),
+.reader-logo,
+.back-link,
+.drawer-logo,
+.drawer-link {
+    transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                text-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s ease,
+                background-color 0.4s ease !important;
+}
+
+/* Adaptive Dark Text on Bright Background */
+body.bright-bg .video-title {
+    color: #050811 !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.65) !important;
+    font-weight: 700;
+}
+
+body.bright-bg .video-card:hover .video-title {
+    color: #000000 !important;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.18) !important;
+}
+
+body.bright-bg .channel-name {
+    color: #0f172a !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+    font-weight: 600;
+}
+
+body.bright-bg .video-card:hover .channel-name {
+    color: #050811 !important;
+}
+
+body.bright-bg .video-stats {
+    color: #1e293b !important;
+    border-top-color: rgba(0, 0, 0, 0.16) !important;
+}
+
+body.bright-bg .stat {
+    color: #1e293b !important;
+    font-weight: 600;
+}
+
+body.bright-bg .topic-tag {
+    color: #050811 !important;
+    background: rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+    text-shadow: none !important;
+}
+
+body.bright-bg .header-content h1,
+body.bright-bg .header-title h1 {
+    color: #050811 !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.85) !important;
+}
+
+body.bright-bg .header-subtitle,
+body.bright-bg .header-content p {
+    color: #1e293b !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+body.bright-bg .header-date {
+    color: #334155 !important;
+}
+
+body.bright-bg .region-select-label,
+body.bright-bg .global-pill-label {
+    color: #090d16 !important;
+}
+
+body.bright-bg .icon-pill-btn {
+    color: #090d16 !important;
+    background: rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+body.bright-bg .icon-pill-btn:hover {
+    color: var(--accent) !important;
+    background: rgba(255, 0, 51, 0.08) !important;
+    border-color: var(--accent) !important;
+}
+
+body.bright-bg .hamburger-btn span {
+    background: #090d16 !important;
+}
+
+body.bright-bg .section-title h2 {
+    color: #050811 !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.85) !important;
+}
+
+body.bright-bg .section-subtitle {
+    color: #1e293b !important;
+}
+
+body.bright-bg .category-tab:not(.active) {
+    color: #1e293b !important;
+    text-shadow: none !important;
+}
+
+body.bright-bg .category-tab:not(.active):hover {
+    color: #050811 !important;
+}
+
+body.bright-bg .seo-card h2,
+body.bright-bg .seo-faq-card h2,
+body.bright-bg .faq-category-header h3 {
+    color: #050811 !important;
+}
+
+body.bright-bg .seo-card p,
+body.bright-bg .seo-card li,
+body.bright-bg .seo-faq-card p,
+body.bright-bg .faq-answer p {
+    color: #1e293b !important;
+}
+
+body.bright-bg .faq-question span {
+    color: #090d16 !important;
+    font-weight: 600;
+}
+
+body.bright-bg .footer-brand h3,
+body.bright-bg .footer-col h4 {
+    color: #050811 !important;
+}
+
+body.bright-bg .footer-brand p,
+body.bright-bg .footer-bottom {
+    color: #334155 !important;
+}
+
+body.bright-bg .footer-col a {
+    color: #1e293b !important;
+}
+
+body.bright-bg .footer-col a:hover {
+    color: var(--accent) !important;
 }
 
 /* Lenis Smooth Scroll Recommended Rules */
@@ -320,11 +488,7 @@ body {
     box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.06), 0 0 8px rgba(255, 0, 51, 0.05);
 }
 
-.light-mode .glass-orb {
-    background: radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.02) 60%, transparent 80%);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.03), 0 0 8px rgba(229, 9, 20, 0.04);
-}
+
 
 /* Glassmorphism Components */
 .glass-header {
@@ -348,13 +512,7 @@ body {
     box-sizing: border-box;
 }
 
-.light-mode .glass-header {
-    background: var(--glass-bg-deep);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-}
+
 
 .header-content {
     display: flex;
@@ -521,30 +679,7 @@ body {
     color: var(--text-primary);
 }
 
-.theme-toggle {
-    cursor: pointer;
-    font-size: 1.4rem;
-    color: var(--text-primary);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease, box-shadow 0.3s ease;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--card-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--card-border);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    flex-shrink: 0;
-}
 
-.theme-toggle:hover {
-    transform: rotate(15deg) scale(1.1);
-    color: var(--accent);
-    box-shadow: 0 0 15px var(--accent-glow);
-}
 
 /* Header Date */
 .header-date {
@@ -587,16 +722,7 @@ body {
     will-change: transform, opacity;
 }
 
-.light-mode .category-tabs {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: var(--glass-blur-heavy);
-    -webkit-backdrop-filter: var(--glass-blur-heavy);
-    border-color: rgba(0, 0, 0, 0.08);
-    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.12),
-               0 0 0 1px rgba(0, 0, 0, 0.05),
-               inset 0 1px 0 rgba(255, 255, 255, 0.85),
-               inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-}
+
 
 .category-tabs.tabs-hidden {
     transform: translateX(-50%) translateY(120px) !important;
@@ -811,29 +937,7 @@ body {
     --border-radius: 50px;
 }
 
-.light-mode .video-card,
-.light-mode .border-glow-card {
-    background: rgba(255, 255, 255, 0.70);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.08),
-               inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
-               inset 0 -1px 0 0 rgba(0, 0, 0, 0.02);
-    --glow-color: hsl(220deg 80% 55%);
-    --glow-color-60: hsl(220deg 80% 55% / 60%);
-    --glow-color-50: hsl(220deg 80% 55% / 50%);
-    --glow-color-40: hsl(220deg 80% 55% / 40%);
-    --glow-color-30: hsl(220deg 80% 55% / 30%);
-    --glow-color-20: hsl(220deg 80% 55% / 20%);
-    --glow-color-10: hsl(220deg 80% 55% / 10%);
-    --gradient-base: linear-gradient(135deg, rgba(147, 51, 234, 0.6) 0%, rgba(2, 132, 199, 0.6) 50%, rgba(225, 29, 72, 0.6) 100%);
-}
 
-.light-mode .video-card > .edge-light,
-.light-mode .border-glow-card > .edge-light {
-    mix-blend-mode: multiply;
-}
 
 /* Directional Specular Border Highlight (follows cursor angle and edge proximity) */
 .video-card::before,
@@ -953,13 +1057,7 @@ body {
                inset 0 1.5px 2px rgba(255, 255, 255, 0.75);
 }
 
-.light-mode .video-card:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.12),
-               inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
-    border-color: rgba(255, 255, 255, 0.95);
-}
+
 
 .thumbnail-container {
     position: relative;
@@ -1225,9 +1323,7 @@ body {
     transform: scale(0);
 }
 
-.light-mode .glass-ripple {
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.08) 0%, rgba(229, 9, 20, 0.06) 40%, transparent 70%);
-}
+
 
 /* ==========================================================================
    Frosted Glass Scroll Reveal State
@@ -1342,10 +1438,7 @@ body {
     animation: btnGlowPulse 1.2s ease-in-out infinite;
 }
 
-.theme-toggle:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease, background 0.2s ease;
-}
+
 
 /* --- Accent Glow Breathing on Badges --- */
 .topic-tag {
@@ -1603,9 +1696,7 @@ body {
     position: relative;
 }
 
-.light-mode .faq-item {
-    background: rgba(0, 0, 0, 0.02);
-}
+
 
 .faq-item.open {
     border-color: rgba(255, 0, 51, 0.4);
@@ -1936,9 +2027,7 @@ body {
     z-index: 100;
 }
 
-.light-mode .reader-nav {
-    background: rgba(247, 248, 250, 0.8);
-}
+
 
 .reader-nav-controls {
     display: flex;
@@ -2227,12 +2316,7 @@ body {
     outline: none;
 }
 
-.light-mode .form-input, 
-.light-mode .form-textarea, 
-.light-mode .form-select {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.12);
-}
+
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
     border-color: var(--accent);
@@ -2284,11 +2368,7 @@ body {
                inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.light-mode .site-footer {
-    background: rgba(247, 248, 250, 0.8);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.04),
-               inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
+
 
 .footer-container {
     max-width: 1200px;
@@ -2604,9 +2684,7 @@ body {
     transition: all 0.2s ease;
 }
 
-.light-mode .error-chip {
-    background: rgba(0, 0, 0, 0.03);
-}
+
 
 .error-chip:hover {
     color: var(--accent);
@@ -2704,11 +2782,7 @@ body {
     pointer-events: none;
 }
 
-.light-mode .mobile-drawer {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.18);
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-}
+
 
 .mobile-drawer.open {
     transform: translateX(0);
@@ -2750,9 +2824,7 @@ body {
     transition: all 0.2s ease;
 }
 
-.light-mode .close-drawer-btn {
-    background: rgba(0, 0, 0, 0.05);
-}
+
 
 .close-drawer-btn:hover {
     color: var(--accent);
@@ -2810,9 +2882,7 @@ body {
     background: rgba(255, 255, 255, 0.04);
 }
 
-.light-mode .drawer-link-sub:hover {
-    background: rgba(0, 0, 0, 0.04);
-}
+
 
 .mobile-drawer-footer {
     margin-top: auto;
@@ -2904,11 +2974,7 @@ body {
         font-size: 0.85rem;
     }
 
-    .theme-toggle {
-        width: 42px;
-        height: 42px;
-        font-size: 1.2rem;
-    }
+
 
     .hamburger-btn {
         width: 42px;
@@ -2964,11 +3030,7 @@ body {
         font-size: 0.84rem;
     }
 
-    .theme-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 1.05rem;
-    }
+
 
     .hamburger-btn {
         width: 40px;
@@ -3058,11 +3120,7 @@ body {
         font-size: 0.8rem;
     }
 
-    .theme-toggle {
-        width: 38px;
-        height: 38px;
-        font-size: 0.95rem;
-    }
+
 
     .hamburger-btn {
         width: 38px;
@@ -3143,10 +3201,10 @@ body {
 
     .glass-header {
         display: grid !important;
-        grid-template-columns: 1fr auto auto !important;
+        grid-template-columns: 1fr auto !important;
         grid-template-areas:
-            "logo theme menu"
-            "filters filters filters" !important;
+            "logo menu"
+            "filters filters" !important;
         row-gap: 8px !important;
         column-gap: 8px !important;
         padding: 0.65rem 0.9rem !important;
@@ -3167,13 +3225,6 @@ body {
 
     .header-controls {
         display: contents !important;
-    }
-
-    .theme-toggle {
-        grid-area: theme !important;
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 0.9rem !important;
     }
 
     .hamburger-btn {
@@ -3405,11 +3456,7 @@ body {
         gap: 6px !important;
     }
 
-    .theme-toggle {
-        width: 34px !important;
-        height: 34px !important;
-        font-size: 0.85rem !important;
-    }
+
 
     .hamburger-btn {
         width: 34px !important;
@@ -3475,7 +3522,7 @@ body {
         flex-shrink: 0 !important;
     }
 
-    .theme-toggle, .hamburger-btn {
+    .hamburger-btn {
         width: 33px !important;
         height: 33px !important;
     }

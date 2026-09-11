@@ -386,7 +386,6 @@
             '.top-guide-btn',
             '.faq-question',
             '.watch-direct-btn',
-            '.theme-toggle',
             '.hamburger-btn'
         ];
 

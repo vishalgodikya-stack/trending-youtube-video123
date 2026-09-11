@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader');
     const errorMessage = document.getElementById('error-message');
     const retryBtn = document.getElementById('retry-btn');
-    const themeToggle = document.getElementById('theme-toggle');
     const currentDateEl = document.getElementById('current-date');
     const regionSelect = document.getElementById('region-select');
 
@@ -130,28 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Dynamic Theme Handling
-    const toggleTheme = () => {
-        document.body.classList.toggle('light-mode');
-        const icon = themeToggle.querySelector('i');
-        
-        if (document.body.classList.contains('light-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            localStorage.setItem('theme', 'light');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-            localStorage.setItem('theme', 'dark');
-        }
-    };
-
-    if (localStorage.getItem('theme') === 'light') {
-        document.body.classList.add('light-mode');
-        themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+    // Ensure any residual theme preference in localStorage is cleaned
+    try {
+        localStorage.removeItem('theme');
+        document.body.classList.remove('light-mode');
+    } catch (e) {
+        // Ignore localStorage error if cookies/storage blocked
     }
-
-    themeToggle.addEventListener('click', toggleTheme);
 
     // Helpers
     const formatViews = (views) => {
@@ -929,13 +913,15 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAccordion('home-faq-accordion');
     setupAccordion('seo-guide-accordion');
 
-    // =========================================================================
-    //  Dynamic Video Thumbnail Background on Card Hover
-    //  - When hovering any video card, use that video's thumbnail as page background
-    //  - Background image itself remains completely SHARP and CLEAR
-    //  - Zero blur, fog, haze, milky overlay, or filter on dynamic background
-    //  - Smooth crossfade between cards
-    //  - Smooth restore to normal background when cursor leaves video cards
+
+    //  Persistent Dynamic Video Thumbnail Background & Dynamic Text Contrast
+    //  - Hovering a video sets its sharp thumbnail as the persistent background
+    //  - Leaving the video KEEPS that thumbnail (LAST HOVERED = PERSISTENT BG)
+    //  - Only changes when another video card is hovered
+    //  - Evaluates background thumbnail luminance to adapt text contrast:
+    //    BRIGHT BACKGROUND -> DARK/READABLE TEXT
+    //    DARK BACKGROUND -> LIGHT/WHITE TEXT
+    //  - 100% sharp text, smooth transitions, zero global fog or milky overlay
     // =========================================================================
     const initDynamicThumbnailBackground = () => {
         const container = document.getElementById('dynamic-thumbnail-bg');
@@ -943,23 +929,70 @@ document.addEventListener('DOMContentLoaded', () => {
         const layerB = document.getElementById('dynamic-bg-layer-b');
         if (!container || !layerA || !layerB) return;
 
+        // Persistent page state tracking the last hovered video thumbnail
+        let persistentActiveThumbnail = '';
         let activeLayer = null;
-        let currentUrl = '';
-        let hideTimer = null;
 
-        const showThumbnail = (url) => {
+        // Contrast / luminance cache to prevent repeated canvas calculations
+        const luminanceCache = new Map();
+
+        // Sample thumbnail image luminance using an offscreen canvas
+        const evaluateThumbnailLuminance = (url, callback) => {
             if (!url) return;
-            if (hideTimer) {
-                clearTimeout(hideTimer);
-                hideTimer = null;
-            }
-
-            if (currentUrl === url && container.classList.contains('active')) {
+            if (luminanceCache.has(url)) {
+                callback(luminanceCache.get(url));
                 return;
             }
 
-            currentUrl = url;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 40;
+                    canvas.height = 24;
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    ctx.drawImage(img, 0, 0, 40, 24);
+                    const imgData = ctx.getImageData(0, 0, 40, 24).data;
+                    let totalLum = 0;
+                    let brightCount = 0;
+                    const pixelCount = imgData.length / 4;
 
+                    for (let i = 0; i < imgData.length; i += 4) {
+                        const r = imgData[i];
+                        const g = imgData[i + 1];
+                        const b = imgData[i + 2];
+                        // ITU-R BT.709 relative perceived luminance
+                        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                        totalLum += lum;
+                        if (lum > 140) brightCount++;
+                    }
+
+                    const avgLum = totalLum / pixelCount;
+                    // Classify as bright if average luminance > 130 or >= 45% bright pixels
+                    const isBright = avgLum > 130 || (brightCount / pixelCount) >= 0.45;
+                    luminanceCache.set(url, isBright);
+                    callback(isBright);
+                } catch (e) {
+                    // Fallback if cross-origin canvas security restriction blocks reading
+                    luminanceCache.set(url, false);
+                    callback(false);
+                }
+            };
+            img.onerror = () => {
+                luminanceCache.set(url, false);
+                callback(false);
+            };
+            img.src = url;
+        };
+
+        const showThumbnail = (url) => {
+            if (!url || url === persistentActiveThumbnail) return;
+
+            // Store in persistent page state
+            persistentActiveThumbnail = url;
+
+            // Smooth crossfade between layers
             if (!activeLayer || activeLayer === 'b') {
                 layerA.style.backgroundImage = `url("${url}")`;
                 layerA.style.zIndex = '2';
@@ -977,24 +1010,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             container.classList.add('active');
+
+            // Evaluate background brightness and dynamically adapt foreground text contrast
+            evaluateThumbnailLuminance(url, (isBright) => {
+                // Verify this is still the active thumbnail
+                if (persistentActiveThumbnail === url) {
+                    document.body.classList.toggle('bright-bg', isBright);
+                }
+            });
         };
 
-        const hideThumbnail = () => {
-            if (hideTimer) clearTimeout(hideTimer);
-            hideTimer = setTimeout(() => {
-                container.classList.remove('active');
-                setTimeout(() => {
-                    if (!container.classList.contains('active')) {
-                        if (layerA) layerA.classList.remove('visible');
-                        if (layerB) layerB.classList.remove('visible');
-                        currentUrl = '';
-                        activeLayer = null;
-                    }
-                }, 400);
-            }, 80);
-        };
-
-        // Delegated mouseover: catch any video card enter
+        // Delegated mouseover: updates persistent background ONLY when another video is hovered
         document.addEventListener('mouseover', (e) => {
             const card = e.target.closest('.video-card');
             if (!card) return;
@@ -1006,32 +1032,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, { passive: true });
 
-        // Delegated mouseout: detect leaving a video card
-        document.addEventListener('mouseout', (e) => {
-            const fromCard = e.target.closest('.video-card');
-            if (!fromCard) return;
-
-            const toCard = e.relatedTarget ? e.relatedTarget.closest('.video-card') : null;
-            if (toCard === fromCard) {
-                // Moving between elements inside the same card
-                return;
-            }
-
-            if (!toCard) {
-                // Moving outside all video cards
-                hideThumbnail();
-            } else {
-                // Moving directly to another card
-                const thumbImg = toCard.querySelector('.video-thumbnail');
-                const nextUrl = toCard.dataset.thumbnail || (thumbImg ? thumbImg.src : null);
-                if (nextUrl) {
-                    showThumbnail(nextUrl);
-                }
-            }
-        }, { passive: true });
-
-        window.addEventListener('blur', hideThumbnail);
-        document.addEventListener('mouseleave', hideThumbnail);
+        // NOTE: No mouseout, mouseleave, or blur listeners are attached.
+        // Once a video is hovered, its thumbnail persists until another video is hovered.
     };
 
     initDynamicThumbnailBackground();

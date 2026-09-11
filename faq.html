@@ -247,9 +247,6 @@
             <i class="fab fa-youtube" style="color: #ff0033;"></i> Trend<span class="highlight">Wave</span>
         </a>
         <div class="reader-nav-controls">
-            <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
-                <i class="fas fa-moon"></i>
-            </div>
             <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Open Navigation Menu" title="Navigation Menu">
                 <span></span>
                 <span></span>
@@ -327,7 +324,7 @@
             <!-- Question 5 -->
             <article class="faq-article">
                 <h2><span class="q-number">5</span> Is any personal login or account required?</h2>
-                <p><strong>No.</strong> TrendWave is 100% open and privacy-friendly. No Google login, tracking cookies, or analytics profiles are used. Your dark/light theme and country preferences are saved purely inside your own browser using <code>localStorage</code>.</p>
+                <p><strong>No.</strong> TrendWave is 100% open and privacy-friendly. No Google login, tracking cookies, or analytics profiles are used. Your country preferences are saved purely inside your own browser using <code>localStorage</code>.</p>
             </article>
 
             <!-- Question 6 -->
@@ -409,25 +406,8 @@
     </footer>
 
     <script>
-        // Synchronize Dark / Light theme on the FAQ page
-        const themeToggle = document.getElementById('theme-toggle');
-        const icon = themeToggle.querySelector('i');
-
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
-            if (document.body.classList.contains('light-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'light');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
+        // Ensure clean dark theme
+        try { localStorage.removeItem('theme'); document.body.classList.remove('light-mode'); } catch (e) {}
 
         // Navigation Drawer Logic
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
