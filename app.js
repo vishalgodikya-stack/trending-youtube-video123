@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.resetTabEntrance) window.resetTabEntrance();
                     }
                 } else if (currentScrollY < lastScrollY) {
-                    // Scrolling up — smoothly restore the bar and replay entrance animation
-                    if (categoryBar && categoryBar.classList.contains('tabs-hidden')) {
+                    // Scrolling up — smoothly restore the bar (unless footer is in view)
+                    if (categoryBar && categoryBar.classList.contains('tabs-hidden') && !categoryBar.dataset.footerVisible) {
                         categoryBar.classList.remove('tabs-hidden');
                         if (window.playTabEntrance) window.playTabEntrance(0);
                     }
@@ -65,6 +65,31 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollTicking = true;
         }
     }, { passive: true });
+
+    // Hide category dock when footer is visible to prevent overlap
+    const siteFooter = document.querySelector('.site-footer');
+    if (siteFooter && categoryBar && 'IntersectionObserver' in window) {
+        const footerObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // Footer is visible — hide the dock
+                    categoryBar.dataset.footerVisible = 'true';
+                    if (!categoryBar.classList.contains('tabs-hidden')) {
+                        categoryBar.classList.add('tabs-hidden');
+                        if (window.resetTabEntrance) window.resetTabEntrance();
+                    }
+                } else {
+                    // Footer left viewport — allow dock to show again
+                    delete categoryBar.dataset.footerVisible;
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0,
+            rootMargin: '0px 0px 60px 0px'  // trigger slightly before footer enters
+        });
+        footerObserver.observe(siteFooter);
+    }
 
     // Global Toggle & Region Management
     const globalToggleBtn = document.getElementById('global-toggle-btn');
