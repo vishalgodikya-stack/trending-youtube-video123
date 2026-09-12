@@ -79,14 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.resetTabEntrance) window.resetTabEntrance();
                     }
                 } else {
-                    // Footer left viewport — allow dock to show again
+                    // Footer left viewport — re-show the dock
                     delete categoryBar.dataset.footerVisible;
+                    if (categoryBar.classList.contains('tabs-hidden')) {
+                        categoryBar.classList.remove('tabs-hidden');
+                        if (window.playTabEntrance) window.playTabEntrance(0);
+                    }
                 }
             });
         }, {
             root: null,
-            threshold: 0,
-            rootMargin: '0px 0px 60px 0px'  // trigger slightly before footer enters
+            threshold: 0.05
         });
         footerObserver.observe(siteFooter);
     }

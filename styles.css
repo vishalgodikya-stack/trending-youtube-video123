@@ -230,7 +230,7 @@ html {
 }
 
 body {
-    background: linear-gradient(135deg, #2f5ec4 0%, #4477dc 35%, #5d8cf0 65%, #3b6bcc 100%);
+    background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 35%, #132748 65%, #0b1a30 100%);
     color: var(--text-primary);
     min-height: 100vh;
     width: 100%;
@@ -251,6 +251,16 @@ body {
     height: 100%;
     z-index: 0;
     overflow: hidden;
+    pointer-events: none;
+}
+
+/* Bottom-to-top vignette fade — black at bottom, transparent at top */
+.background-elements::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 25%, rgba(0, 0, 0, 0.2) 55%, transparent 85%);
     pointer-events: none;
 }
 
