@@ -706,6 +706,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileDrawerOverlay = document.getElementById('mobile-drawer-overlay');
     const topGuideToggleBtn = document.getElementById('top-guide-toggle-btn');
 
+    // Robust resolver for video thumbnails:
+    const SVG_THUMBNAIL_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20360%22%20width%3D%22640%22%20height%3D%22360%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%2311131f%22%2F%3E%3Cpath%20d%3D%22M295%20150L355%20180L295%20210Z%22%20fill%3D%22%23ff0033%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%22245%22%20fill%3D%22%23ffffff%22%20font-size%3D%2216%22%20font-family%3D%22sans-serif%22%20opacity%3D%220.8%22%20text-anchor%3D%22middle%22%3ETrendWave%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+    // Prioritizes direct Google/YouTube CDN using video ID to avoid broken Piped proxy instances (e.g. 502 Bad Gateway)
+    const resolveThumbnailUrl = (video, videoId) => {
+        if (videoId) {
+            return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+        }
+        let url = (video && video.thumbnail) ? video.thumbnail.trim() : '';
+        if (url) {
+            try {
+                if (url.includes('proxy') || url.includes('piped')) {
+                    const parsed = new URL(url);
+                    const host = parsed.searchParams.get('host') || 'i.ytimg.com';
+                    return `https://${host}${parsed.pathname}`;
+                }
+            } catch (e) {}
+            return url;
+        }
+        return SVG_THUMBNAIL_PLACEHOLDER;
+    };
+
+    // Robust resolver for channel avatars:
+    // Unproxies Piped proxy URLs back to direct Google CDN (yt3.ggpht.com)
+    const resolveAvatarUrl = (rawAvatar) => {
+        if (!rawAvatar || typeof rawAvatar !== 'string') return null;
+        let url = rawAvatar.trim();
+        try {
+            if (url.includes('proxy') || url.includes('piped')) {
+                const parsed = new URL(url);
+                const host = parsed.searchParams.get('host') || 'yt3.ggpht.com';
+                return `https://${host}${parsed.pathname}`;
+            }
+        } catch (e) {}
+        return url;
+    };
+
     // Render Next Batch of Video Cards
     const renderNextVideoBatch = () => {
         const nextBatch = currentFilteredVideos.slice(displayedVideoCount, displayedVideoCount + BATCH_SIZE);
@@ -725,8 +762,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Direct video playback link fallback
             const watchDirectUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : topicSearchUrl;
             
-            const tNavUrl = video.thumbnail || 'https://via.placeholder.com/640x360.png?text=No+Thumbnail';
-            const avatarUrl = video.uploaderAvatar;
+            const tNavUrl = resolveThumbnailUrl(video, videoId);
+            const avatarUrl = resolveAvatarUrl(video.uploaderAvatar);
             
             const durationHtml = isLive 
                 ? `<div class="video-duration live-badge"><i class="fas fa-circle"></i> LIVE</div>`
@@ -746,10 +783,21 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
             
+            const safeTitle = (video.title || '').replace(/"/g, '&quot;');
+            const safeUploader = (video.uploaderName || '').replace(/"/g, '&quot;');
+            const avatarInitials = encodeURIComponent((video.uploaderName || 'YT').substring(0, 8));
+
             card.innerHTML = `
                 <span class="edge-light" aria-hidden="true"></span>
                 <div class="thumbnail-container">
-                    <img src="${tNavUrl}" alt="${video.title}" class="video-thumbnail" loading="lazy">
+                    <img 
+                        src="${tNavUrl}" 
+                        alt="${safeTitle}" 
+                        class="video-thumbnail" 
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        onerror="if(this.dataset.fb!=='mq'&&'${videoId}'){this.dataset.fb='mq';this.src='https://i.ytimg.com/vi/${videoId}/mqdefault.jpg';}else if(this.dataset.fb!=='ph'){this.dataset.fb='ph';this.src='${SVG_THUMBNAIL_PLACEHOLDER}';}"
+                    >
                     <a href="${watchDirectUrl}" target="_blank" rel="noopener noreferrer" class="play-overlay" title="Watch direct video" onclick="event.stopPropagation();">
                         <i class="fas fa-play-circle"></i>
                     </a>
@@ -757,10 +805,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="card-content">
                     <span class="topic-tag"><i class="fas fa-fire"></i> Trending Topic</span>
-                    <h3 class="video-title" title="${video.title}">${video.title}</h3>
+                    <h3 class="video-title" title="${safeTitle}">${video.title}</h3>
                     <div class="channel-info">
                         ${avatarUrl ? 
-                            `<img src="${avatarUrl}" alt="${video.uploaderName}" class="channel-avatar" loading="lazy">` : 
+                            `<img 
+                                src="${avatarUrl}" 
+                                alt="${safeUploader}" 
+                                class="channel-avatar" 
+                                loading="lazy"
+                                referrerpolicy="no-referrer"
+                                onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${avatarInitials}&background=ff0033&color=fff&size=68';"
+                            >` : 
                             `<div class="channel-avatar"><i class="fas fa-user"></i></div>`
                         }
                         <span class="channel-name">${video.uploaderName}</span>
@@ -812,9 +867,12 @@ document.addEventListener('DOMContentLoaded', () => {
         renderNextVideoBatch();
 
         // Notify dynamic ambient backdrop engine of top video thumbnail
-        if (currentFilteredVideos.length > 0 && currentFilteredVideos[0].thumbnail) {
+        if (currentFilteredVideos.length > 0) {
+            const topVid = currentFilteredVideos[0];
+            const topId = extractVideoId(topVid);
+            const topThumb = resolveThumbnailUrl(topVid, topId);
             window.dispatchEvent(new CustomEvent('trendingVideosReady', {
-                detail: { topThumbnail: currentFilteredVideos[0].thumbnail }
+                detail: { topThumbnail: topThumb }
             }));
         }
     };
